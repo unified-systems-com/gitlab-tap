@@ -1,0 +1,23 @@
+# Thin caller of core's reusable per-repo CI (req-tap-plugin-extdev-repo-ci). Two pins,
+# independent (req-tap-plugin-extdev-repo-ci-9): the `uses:` SHA pins WHICH validation
+# logic runs; the plugin's manifest `requires_tap` pins WHICH core it runs against.
+# The in-package tap_plugin/gitlab/boot/ci.boot.json IS the opt-in (req-boot-bootstrap-ci-record-6).
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tap:
+    # Pinned to unified-systems-com/tap main at 422a56be3abe8dc63630394aac5ea9622eb70a99 (2026-09-22).
+    uses: unified-systems-com/tap/.github/workflows/plugin-ci.yml@422a56be3abe8dc63630394aac5ea9622eb70a99
+    with:
+      plugin_slug: gitlab
+    secrets:
+      harness_pat: ${{ secrets.TAP_CORE_RO_PAT }}
