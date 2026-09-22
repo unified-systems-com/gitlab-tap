@@ -15,6 +15,10 @@ permissions:
 
 jobs:
   tap:
+    # plugin-ci's submit-dependency-snapshot job holds contents: write (tap#664); a caller that
+    # does not grant it fails at startup — every job, not just that one.
+    permissions:
+      contents: write
     # Pinned to unified-systems-com/tap main at 422a56be3abe8dc63630394aac5ea9622eb70a99 (2026-09-22).
     uses: unified-systems-com/tap/.github/workflows/plugin-ci.yml@422a56be3abe8dc63630394aac5ea9622eb70a99
     with:
