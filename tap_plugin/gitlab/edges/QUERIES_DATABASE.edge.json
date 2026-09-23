@@ -1,0 +1,52 @@
+{
+  "slug": "QUERIES_DATABASE__gitlab",
+  "name": "Queries Database",
+  "description": "A component connects to a PostgreSQL database. The target is open: an RDS instance (aws_core__aws_rds_instance) here, any full PostgreSQL elsewhere. Aurora is not supported by GitLab.",
+  "sources": [
+    "gitlab__gitlab_component",
+    "gitlab__gitaly_node"
+  ],
+  "property_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "database": {
+        "type": "string",
+        "enum": [
+          "main",
+          "ci",
+          "embedding",
+          "registry",
+          "praefect"
+        ],
+        "description": "Which logical database (GitLab decomposes main and ci; the registry and Praefect have their own)."
+      },
+      "role": {
+        "type": "string",
+        "enum": [
+          "primary",
+          "replica"
+        ],
+        "description": "Whether this connection is to the primary or a read replica."
+      },
+      "tls_mode": {
+        "type": "string",
+        "enum": [
+          "disable",
+          "allow",
+          "prefer",
+          "require",
+          "verify-ca",
+          "verify-full"
+        ],
+        "description": "The libpq sslmode the component uses."
+      }
+    },
+    "required": [
+      "database"
+    ]
+  },
+  "default_dimensions": {
+    "gitlab.plane": "infrastructure"
+  }
+}

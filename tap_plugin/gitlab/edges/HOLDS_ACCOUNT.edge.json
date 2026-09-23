@@ -1,0 +1,14 @@
+{
+  "slug": "HOLDS_ACCOUNT__gitlab",
+  "name": "Holds Account",
+  "description": "An instance holds this user account (a person, a service account, or a token's bot user).",
+  "sources": [
+    "gitlab__gitlab_instance"
+  ],
+  "targets": [
+    "gitlab__gitlab_user"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

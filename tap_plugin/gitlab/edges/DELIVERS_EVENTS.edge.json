@@ -1,0 +1,11 @@
+{
+  "slug": "DELIVERS_EVENTS__gitlab",
+  "name": "Delivers Events",
+  "description": "An audit event destination delivers events to this sink. The target is open: an S3 bucket (aws_core__aws_s3_bucket), a SIEM's HTTP collector, a Cloud Logging log.",
+  "sources": [
+    "gitlab__audit_event_destination"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

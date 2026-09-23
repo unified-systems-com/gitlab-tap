@@ -1,0 +1,27 @@
+{
+  "slug": "ENABLES_DEPLOY_KEY__gitlab",
+  "name": "Enables Deploy Key",
+  "description": "A project enables a deploy key, read-only or with write access. The same key may be enabled on many projects with different access, so write access is a property of this edge.",
+  "sources": [
+    "gitlab__gitlab_project"
+  ],
+  "targets": [
+    "gitlab__deploy_key"
+  ],
+  "property_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "can_push": {
+        "type": "boolean",
+        "description": "Whether the key may push to this project."
+      }
+    },
+    "required": [
+      "can_push"
+    ]
+  },
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

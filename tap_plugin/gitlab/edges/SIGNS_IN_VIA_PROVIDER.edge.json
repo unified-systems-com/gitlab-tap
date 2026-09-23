@@ -1,0 +1,24 @@
+{
+  "slug": "SIGNS_IN_VIA_PROVIDER__gitlab",
+  "name": "Signs In Via Provider",
+  "description": "A user account is linked to an identity at a sign-in provider (GitLab's identities list).",
+  "sources": [
+    "gitlab__gitlab_user"
+  ],
+  "targets": [
+    "gitlab__sso_provider"
+  ],
+  "property_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "extern_uid": {
+        "type": "string",
+        "description": "The user's identifier at the provider (a SAML NameID, an OIDC subject, an LDAP DN)."
+      }
+    }
+  },
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

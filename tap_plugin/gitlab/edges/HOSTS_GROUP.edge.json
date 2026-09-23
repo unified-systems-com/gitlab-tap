@@ -1,0 +1,14 @@
+{
+  "slug": "HOSTS_GROUP__gitlab",
+  "name": "Hosts Group",
+  "description": "An instance hosts this top-level group. Subgroups hang from their parent with NESTS_SUBGROUP.",
+  "sources": [
+    "gitlab__gitlab_instance"
+  ],
+  "targets": [
+    "gitlab__gitlab_group"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

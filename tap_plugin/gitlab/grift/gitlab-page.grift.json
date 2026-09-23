@@ -1,0 +1,3865 @@
+{
+  "metadata": {
+    "grift_version": "0"
+  },
+  "_reserved": {},
+  "batches": [
+    {
+      "batch_entity": {
+        "entity_id": "01a0cc75-d994-7521-8f3c-8fae6bb73706",
+        "entity_type": "batch",
+        "name": "gitlab page v0.1.0",
+        "dimensions": {}
+      },
+      "batch_node": {
+        "source": "plugins.gitlab",
+        "name": "gitlab page v0.1.0",
+        "description": "The /gitlab page (req-gitlab-page): the deployment graph (projection, elevation, layout module, scene searches), the posture strip, and the operator tables with their searches. Every search takes ?instance=<name>."
+      },
+      "nodes": [
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c130-7223-a612-9aec9b8f0a5c",
+            "entity_type": "layout",
+            "name": "gitlab deployment layout",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab deployment layout",
+            "description": "Draws each GitLab instance in the scene as one box: ingress on the left, the processes nested in the compute service each runs on, the runners under them, data stores to the right, sign-in and audit last, and trusted identity providers and event sinks outside the box. Every placement is derived from the vocabulary's edges, never from an entity id, so any page whose scene holds GitLab nodes can use it (req-gitlab-layout).",
+            "definition": {
+              "js_file": "tap_plugin/gitlab/static/gitlab/js/projections/gitlab-deployment.js",
+              "arrangements": []
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c175-77c0-afc2-31b5e92e9553",
+            "entity_type": "elevation",
+            "name": "gitlab deployment elevation",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab deployment elevation",
+            "description": "A GitLab deployment at one elevation: the deployment layout module alone.",
+            "definition": {
+              "zoom": 1.0,
+              "description": "A GitLab deployment at one elevation.",
+              "layouts": [
+                "01a0cc75-c130-7223-a612-9aec9b8f0a5c"
+              ],
+              "double_tap_targets": []
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c1ad-7512-acba-762f6add9afd",
+            "entity_type": "projection",
+            "name": "gitlab deployment projection",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab deployment projection",
+            "description": "A GitLab deployment as one placed picture: icon-badge nodes (each type's icon as a badge on its card), containers for the instance and each compute service, placement fixed by the layout module and opened fitted.",
+            "definition": {
+              "node_style": {
+                "mode": "icon-badge"
+              },
+              "elevations": [
+                "01a0cc75-c175-77c0-afc2-31b5e92e9553"
+              ],
+              "default_elevation_id": "01a0cc75-c175-77c0-afc2-31b5e92e9553",
+              "min_zoom": "fit",
+              "lock_nodes": true
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c2af-738a-82dd-3fba165cd7ad",
+            "entity_type": "search",
+            "name": "gitlab — scene: instances",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: instances",
+            "description": "The GitLab instances the page shows. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (i:gitlab__gitlab_instance)",
+                "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance",
+                "RETURN i"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c2e9-743f-bc04-a735486b158a",
+            "entity_type": "search",
+            "name": "gitlab — scene: processes of each instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: processes of each instance",
+            "description": "Each instance's components and Gitaly nodes, with the RUNS_COMPONENT edges. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (i:gitlab__gitlab_instance)-[:RUNS_COMPONENT__gitlab]->(c)",
+                "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance",
+                "RETURN i, c"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-008c-702d-acba-720cf2fdf0cd",
+            "entity_type": "search",
+            "name": "gitlab — scene: the compute service each GitLab process runs on (component)",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: the compute service each GitLab process runs on (component)",
+            "description": "Both ends of every RUNS_ON_SERVICE__gitlab edge from a gitlab__gitlab_component of the instance, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__gitlab_component)-[:RUNS_ON_SERVICE__gitlab]->(t)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c, t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-00c5-76b8-836e-65a033e598d8",
+            "entity_type": "search",
+            "name": "gitlab — scene: the compute service each GitLab process runs on (gitaly)",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: the compute service each GitLab process runs on (gitaly)",
+            "description": "Both ends of every RUNS_ON_SERVICE__gitlab edge from a gitlab__gitaly_node of the instance, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__gitaly_node)-[:RUNS_ON_SERVICE__gitlab]->(t)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c, t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-00f9-749e-a954-d8051fdceef9",
+            "entity_type": "search",
+            "name": "gitlab — scene: the compute service each GitLab process runs on (manager)",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: the compute service each GitLab process runs on (manager)",
+            "description": "Both ends of every RUNS_ON_SERVICE__gitlab edge from a gitlab__runner_manager of the instance, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__runner_manager)-[:RUNS_ON_SERVICE__gitlab]->(t)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c, t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-012b-7586-8232-ef5ad0a4a260",
+            "entity_type": "search",
+            "name": "gitlab — scene: the databases GitLab processes query (component)",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: the databases GitLab processes query (component)",
+            "description": "Both ends of every QUERIES_DATABASE__gitlab edge from a gitlab__gitlab_component of the instance, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__gitlab_component)-[:QUERIES_DATABASE__gitlab]->(t)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c, t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-015d-7762-98b9-321914f4daa8",
+            "entity_type": "search",
+            "name": "gitlab — scene: the databases GitLab processes query (gitaly)",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: the databases GitLab processes query (gitaly)",
+            "description": "Both ends of every QUERIES_DATABASE__gitlab edge from a gitlab__gitaly_node of the instance, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__gitaly_node)-[:QUERIES_DATABASE__gitlab]->(t)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c, t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-0190-7306-b37f-031e7e9aa3a9",
+            "entity_type": "search",
+            "name": "gitlab — scene: the Redis instances GitLab components call (component)",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: the Redis instances GitLab components call (component)",
+            "description": "Both ends of every CALLS_REDIS__gitlab edge from a gitlab__gitlab_component of the instance, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__gitlab_component)-[:CALLS_REDIS__gitlab]->(t)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c, t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-01c2-731c-a09a-8bd0de3ee29f",
+            "entity_type": "search",
+            "name": "gitlab — scene: the object stores GitLab processes write to (component)",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: the object stores GitLab processes write to (component)",
+            "description": "Both ends of every STORES_OBJECTS__gitlab edge from a gitlab__gitlab_component of the instance, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__gitlab_component)-[:STORES_OBJECTS__gitlab]->(t)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c, t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-01f8-74c0-ad15-8c685954b3b0",
+            "entity_type": "search",
+            "name": "gitlab — scene: the object stores GitLab processes write to (manager)",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: the object stores GitLab processes write to (manager)",
+            "description": "Both ends of every STORES_OBJECTS__gitlab edge from a gitlab__runner_manager of the instance, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__runner_manager)-[:STORES_OBJECTS__gitlab]->(t)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c, t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-0231-7218-84a7-f8f56566a3e7",
+            "entity_type": "search",
+            "name": "gitlab — scene: the volumes Gitaly keeps repositories on (gitaly)",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: the volumes Gitaly keeps repositories on (gitaly)",
+            "description": "Both ends of every STORES_REPOSITORIES_ON_VOLUME__gitlab edge from a gitlab__gitaly_node of the instance, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__gitaly_node)-[:STORES_REPOSITORIES_ON_VOLUME__gitlab]->(t)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c, t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-026a-7283-8811-4f199afb2f55",
+            "entity_type": "search",
+            "name": "gitlab — scene: the secrets GitLab processes read (component)",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: the secrets GitLab processes read (component)",
+            "description": "Both ends of every READS_SECRET__gitlab edge from a gitlab__gitlab_component of the instance, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__gitlab_component)-[:READS_SECRET__gitlab]->(t)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c, t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-02a2-779e-8d13-f287753b4a16",
+            "entity_type": "search",
+            "name": "gitlab — scene: the secrets GitLab processes read (gitaly)",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: the secrets GitLab processes read (gitaly)",
+            "description": "Both ends of every READS_SECRET__gitlab edge from a gitlab__gitaly_node of the instance, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__gitaly_node)-[:READS_SECRET__gitlab]->(t)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c, t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-02d7-77a8-9071-febaf412855a",
+            "entity_type": "search",
+            "name": "gitlab — scene: the secrets GitLab processes read (manager)",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: the secrets GitLab processes read (manager)",
+            "description": "Both ends of every READS_SECRET__gitlab edge from a gitlab__runner_manager of the instance, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__runner_manager)-[:READS_SECRET__gitlab]->(t)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c, t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-030b-721d-816d-f2ee4e7af2c2",
+            "entity_type": "search",
+            "name": "gitlab — scene: where runner managers launch jobs (manager)",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: where runner managers launch jobs (manager)",
+            "description": "Both ends of every LAUNCHES_JOB_TASKS__gitlab edge from a gitlab__runner_manager of the instance, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__runner_manager)-[:LAUNCHES_JOB_TASKS__gitlab]->(t)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c, t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-033f-706f-8101-8abfd53344b4",
+            "entity_type": "search",
+            "name": "gitlab — scene: the runner registration each manager authenticates as (manager)",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: the runner registration each manager authenticates as (manager)",
+            "description": "Both ends of every AUTHENTICATES_AS_RUNNER__gitlab edge from a gitlab__runner_manager of the instance, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__runner_manager)-[:AUTHENTICATES_AS_RUNNER__gitlab]->(t)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c, t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c572-71e0-867e-3617229714eb",
+            "entity_type": "search",
+            "name": "gitlab — scene: load balancers in front of GitLab",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: load balancers in front of GitLab",
+            "description": "Load balancers that route traffic to a GitLab process of the instance (aws_core's ROUTES_TRAFFIC), with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (lb)-[:ROUTES_TRAFFIC__aws_core]->(c:gitlab__gitlab_component)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN lb, c"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c5ca-7533-bc05-0c0641a2bbd2",
+            "entity_type": "search",
+            "name": "gitlab — scene: instance runners",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: instance runners",
+            "description": "Instance-scoped runner registrations (the ones open to every project), whether or not a manager serves them, with the REGISTERS_RUNNER edge the layout reads ownership from. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (i:gitlab__gitlab_instance)-[:REGISTERS_RUNNER__gitlab]->(r:gitlab__gitlab_runner)",
+                "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance AND r.data.runner_type = \"instance_type\"",
+                "RETURN i, r"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c60d-7257-9750-a9482e46125b",
+            "entity_type": "search",
+            "name": "gitlab — scene: sign-in providers",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: sign-in providers",
+            "description": "The providers each instance delegates sign-in to, with the edge. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (i:gitlab__gitlab_instance)-[:AUTHENTICATES_VIA_PROVIDER__gitlab]->(p)",
+                "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance",
+                "RETURN i, p"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c64d-72d1-b7b4-08ff0d4bbeb6",
+            "entity_type": "search",
+            "name": "gitlab — scene: SAML identity providers trusted",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: SAML identity providers trusted",
+            "description": "The SAML identity providers each sign-in provider trusts. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (p:gitlab__sso_provider)-[:TRUSTS_SAML_IDP__gitlab]->(x)",
+                "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance",
+                "RETURN p, x"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c68c-7407-a891-cee61b7bf74f",
+            "entity_type": "search",
+            "name": "gitlab — scene: OIDC issuers trusted",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: OIDC issuers trusted",
+            "description": "The OIDC issuers each sign-in provider trusts (identity_core's TRUSTS_ISSUER). Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (p:gitlab__sso_provider)-[:TRUSTS_ISSUER__identity_core]->(x)",
+                "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance",
+                "RETURN p, x"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c6c8-70da-a6e7-8e991ac1ebbf",
+            "entity_type": "search",
+            "name": "gitlab — scene: audit event streams",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: audit event streams",
+            "description": "The audit event destinations each instance streams to. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (i:gitlab__gitlab_instance)-[:STREAMS_AUDIT_EVENTS__gitlab]->(d)",
+                "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance",
+                "RETURN i, d"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c70b-7594-8b72-f8db37f1b6e0",
+            "entity_type": "search",
+            "name": "gitlab — scene: where audit events land",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — scene: where audit events land",
+            "description": "The sinks each audit event destination delivers to. Scene search for the /gitlab deployment graph (req-gitlab-page); names its edge type, never an unfiltered edge search.",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (d:gitlab__audit_event_destination)-[:DELIVERS_EVENTS__gitlab]->(x)",
+                "WHERE d.data.instance_name STARTS_WITH $instance AND d.data.instance_name ENDS_WITH $instance",
+                "RETURN d, x"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "entity_type": "panel",
+            "name": "GitLab deployment",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "GitLab deployment",
+            "slug": "gitlab-deployment",
+            "description": "The instance as deployed: load balancers on the left, each GitLab process inside the compute service it runs on (Gitaly on its own, with its volume), the runner managers and where they launch jobs underneath, the databases, Redis, object stores and secrets it reaches on the right, and the identity provider it trusts and the sinks its audit events land in outside the box. Every box and line is a grid edge; nothing is drawn from a picture.",
+            "view": "tap_viz/panels/graph_panel.html",
+            "editor_view": "",
+            "config": {
+              "height": "100%",
+              "hide_header": true,
+              "nav_rules": [
+                {
+                  "entity_type": "gitlab__gitlab_instance",
+                  "url_template": "/gitlab?instance={data.name}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cbfa-7001-9584-34ec806f39a4",
+            "entity_type": "panel",
+            "name": "GitLab posture",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "GitLab posture",
+            "slug": "gitlab-posture",
+            "description": "Which instance the page shows, then one tile per posture question an operator of a FedRAMP 20x environment answers first. A tile reads a count, clear, or not observed (the grid holds none of that type for the instance), never a zero it cannot vouch for.",
+            "view": "gitlab/panels/posture.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": true,
+              "tiles": [
+                {
+                  "key": "components",
+                  "label": "Components reporting degraded or unhealthy",
+                  "help": "GitLab components and Gitaly nodes whose last health verdict was degraded or unhealthy. The second number counts those whose health has never been observed — unknown, not healthy.",
+                  "population": [
+                    "MATCH (c:gitlab__gitlab_component)",
+                    "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                    "RETURN c"
+                  ],
+                  "finding": [
+                    "MATCH (c:gitlab__gitlab_component)",
+                    "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance AND c.data.health IN [\"degraded\", \"unhealthy\"]",
+                    "RETURN c"
+                  ],
+                  "secondary": {
+                    "label": "health not observed",
+                    "query": [
+                      "MATCH (c:gitlab__gitlab_component)",
+                      "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance AND c.data.health = \"\"",
+                      "RETURN c"
+                    ]
+                  },
+                  "tone": "bad_if_any"
+                },
+                {
+                  "key": "gitaly-storage",
+                  "label": "Gitaly on unsupported storage",
+                  "help": "Gitaly nodes whose repositories sit on NFS or EFS. GitLab supports only local block storage (an attached EBS volume) for Gitaly.",
+                  "population": [
+                    "MATCH (g:gitlab__gitaly_node)",
+                    "WHERE g.data.instance_name STARTS_WITH $instance AND g.data.instance_name ENDS_WITH $instance",
+                    "RETURN g"
+                  ],
+                  "finding": [
+                    "MATCH (g:gitlab__gitaly_node)-[e:STORES_REPOSITORIES_ON_VOLUME__gitlab]->(v)",
+                    "WHERE g.data.instance_name STARTS_WITH $instance AND g.data.instance_name ENDS_WITH $instance AND e.data.properties.filesystem IN [\"nfs\", \"efs\"]",
+                    "RETURN g"
+                  ],
+                  "tone": "bad_if_any"
+                },
+                {
+                  "key": "open-runners",
+                  "label": "Instance runners open to any job",
+                  "help": "Instance-scoped runners that take untagged jobs from unprotected refs: any project's pipeline, including a fork's merge request, can run on them.",
+                  "population": [
+                    "MATCH (r:gitlab__gitlab_runner)",
+                    "WHERE r.data.instance_name STARTS_WITH $instance AND r.data.instance_name ENDS_WITH $instance",
+                    "RETURN r"
+                  ],
+                  "finding": [
+                    "MATCH (r:gitlab__gitlab_runner)",
+                    "WHERE r.data.instance_name STARTS_WITH $instance AND r.data.instance_name ENDS_WITH $instance AND r.data.runner_type = \"instance_type\" AND r.data.run_untagged = true AND r.data.access_level = \"not_protected\"",
+                    "RETURN r"
+                  ],
+                  "tone": "bad_if_any"
+                },
+                {
+                  "key": "privileged",
+                  "label": "Runner managers running jobs privileged",
+                  "help": "Runner managers configured to run jobs privileged. A privileged job can escape to its host and read other jobs' secrets. Read from config.toml; the GitLab API does not expose it, so the second number is those never observed.",
+                  "population": [
+                    "MATCH (m:gitlab__runner_manager)",
+                    "WHERE m.data.instance_name STARTS_WITH $instance AND m.data.instance_name ENDS_WITH $instance",
+                    "RETURN m"
+                  ],
+                  "finding": [
+                    "MATCH (m:gitlab__runner_manager)",
+                    "WHERE m.data.instance_name STARTS_WITH $instance AND m.data.instance_name ENDS_WITH $instance AND m.data.privileged = true",
+                    "RETURN m"
+                  ],
+                  "secondary": {
+                    "label": "not observed",
+                    "query": [
+                      "MATCH (m:gitlab__runner_manager)",
+                      "WHERE m.data.instance_name STARTS_WITH $instance AND m.data.instance_name ENDS_WITH $instance AND m.data.privileged IS NULL",
+                      "RETURN m"
+                    ]
+                  },
+                  "tone": "bad_if_any"
+                },
+                {
+                  "key": "variables",
+                  "label": "CI/CD variables not protected",
+                  "help": "Variables every pipeline receives, including those on unprotected branches. The second number counts variables GitLab does not mask in job logs.",
+                  "population": [
+                    "MATCH (v:gitlab__ci_variable)",
+                    "WHERE v.data.instance_name STARTS_WITH $instance AND v.data.instance_name ENDS_WITH $instance",
+                    "RETURN v"
+                  ],
+                  "finding": [
+                    "MATCH (v:gitlab__ci_variable)",
+                    "WHERE v.data.instance_name STARTS_WITH $instance AND v.data.instance_name ENDS_WITH $instance AND v.data.protected = false",
+                    "RETURN v"
+                  ],
+                  "secondary": {
+                    "label": "not masked",
+                    "query": [
+                      "MATCH (v:gitlab__ci_variable)",
+                      "WHERE v.data.instance_name STARTS_WITH $instance AND v.data.instance_name ENDS_WITH $instance AND v.data.masked = false",
+                      "RETURN v"
+                    ]
+                  },
+                  "tone": "bad_if_any"
+                },
+                {
+                  "key": "tokens-never-expire",
+                  "label": "Access tokens that never expire",
+                  "help": "Active personal, group, project and impersonation tokens with no expiry date. The second number counts active tokens expiring in the next 30 days.",
+                  "population": [
+                    "MATCH (t:gitlab__access_token)",
+                    "WHERE t.data.instance_name STARTS_WITH $instance AND t.data.instance_name ENDS_WITH $instance",
+                    "RETURN t"
+                  ],
+                  "finding": [
+                    "MATCH (t:gitlab__access_token)",
+                    "WHERE t.data.instance_name STARTS_WITH $instance AND t.data.instance_name ENDS_WITH $instance AND t.data.expires = false AND (t.data.revoked = false OR t.data.revoked IS NULL)",
+                    "RETURN t"
+                  ],
+                  "secondary": {
+                    "label": "expire within 30 days",
+                    "query": [
+                      "MATCH (t:gitlab__access_token)",
+                      "WHERE t.data.instance_name STARTS_WITH $instance AND t.data.instance_name ENDS_WITH $instance AND t.data.expires_at != \"\" AND t.data.expires_at < $cutoff AND (t.data.revoked = false OR t.data.revoked IS NULL)",
+                      "RETURN t"
+                    ]
+                  },
+                  "tone": "bad_if_any"
+                },
+                {
+                  "key": "deploy-keys-never-expire",
+                  "label": "Deploy keys that never expire",
+                  "help": "Deploy keys with no expiry. The second number counts keys some project lets push.",
+                  "population": [
+                    "MATCH (k:gitlab__deploy_key)",
+                    "WHERE k.data.instance_name STARTS_WITH $instance AND k.data.instance_name ENDS_WITH $instance",
+                    "RETURN k"
+                  ],
+                  "finding": [
+                    "MATCH (k:gitlab__deploy_key)",
+                    "WHERE k.data.instance_name STARTS_WITH $instance AND k.data.instance_name ENDS_WITH $instance AND k.data.expires = false",
+                    "RETURN k"
+                  ],
+                  "secondary": {
+                    "label": "with write access",
+                    "query": [
+                      "MATCH (p:gitlab__gitlab_project)-[e:ENABLES_DEPLOY_KEY__gitlab]->(k:gitlab__deploy_key)",
+                      "WHERE k.data.instance_name STARTS_WITH $instance AND k.data.instance_name ENDS_WITH $instance AND e.data.properties.can_push = true",
+                      "RETURN k"
+                    ]
+                  },
+                  "tone": "bad_if_any"
+                },
+                {
+                  "key": "force-push",
+                  "label": "Protected branches allowing force-push",
+                  "help": "Protected-branch rules that still allow force-push, which rewrites history the protection was meant to keep.",
+                  "population": [
+                    "MATCH (b:gitlab__protected_branch)",
+                    "WHERE b.data.instance_name STARTS_WITH $instance AND b.data.instance_name ENDS_WITH $instance",
+                    "RETURN b"
+                  ],
+                  "finding": [
+                    "MATCH (b:gitlab__protected_branch)",
+                    "WHERE b.data.instance_name STARTS_WITH $instance AND b.data.instance_name ENDS_WITH $instance AND b.data.allow_force_push = true",
+                    "RETURN b"
+                  ],
+                  "tone": "bad_if_any"
+                },
+                {
+                  "key": "job-token",
+                  "label": "Projects accepting any job token",
+                  "help": "Projects whose CI_JOB_TOKEN inbound allowlist is off: a job in any project on the instance can use its token against them.",
+                  "population": [
+                    "MATCH (p:gitlab__gitlab_project)",
+                    "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance",
+                    "RETURN p"
+                  ],
+                  "finding": [
+                    "MATCH (p:gitlab__gitlab_project)",
+                    "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance AND p.data.job_token_inbound_enabled = false",
+                    "RETURN p"
+                  ],
+                  "tone": "bad_if_any"
+                },
+                {
+                  "key": "no-2fa",
+                  "label": "Active people without GitLab 2FA",
+                  "help": "Active human accounts with no GitLab two-factor authentication. Where sign-in goes only through an SSO provider that enforces MFA, this is expected; the SSO table says whether it does.",
+                  "population": [
+                    "MATCH (u:gitlab__gitlab_user)",
+                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.user_type = \"human\"",
+                    "RETURN u"
+                  ],
+                  "finding": [
+                    "MATCH (u:gitlab__gitlab_user)",
+                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.user_type = \"human\" AND u.data.state = \"active\" AND u.data.two_factor_enabled = false",
+                    "RETURN u"
+                  ],
+                  "tone": "bad_if_any"
+                },
+                {
+                  "key": "admins",
+                  "label": "Administrators",
+                  "help": "Accounts with instance administrator rights. Not a finding by itself; the number an assessor asks for first.",
+                  "population": [
+                    "MATCH (u:gitlab__gitlab_user)",
+                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance",
+                    "RETURN u"
+                  ],
+                  "finding": [
+                    "MATCH (u:gitlab__gitlab_user)",
+                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.is_admin = true",
+                    "RETURN u"
+                  ],
+                  "tone": "bad_if_any"
+                },
+                {
+                  "key": "password-signin",
+                  "label": "Password sign-in on the web",
+                  "help": "Instances that still accept a password on the web sign-in page. With SSO in place, password sign-in is the path around it.",
+                  "population": [
+                    "MATCH (i:gitlab__gitlab_instance)",
+                    "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance",
+                    "RETURN i"
+                  ],
+                  "finding": [
+                    "MATCH (i:gitlab__gitlab_instance)",
+                    "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance AND i.data.password_auth_enabled_for_web = true",
+                    "RETURN i"
+                  ],
+                  "secondary": {
+                    "label": "not observed",
+                    "query": [
+                      "MATCH (i:gitlab__gitlab_instance)",
+                      "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance AND i.data.password_auth_enabled_for_web IS NULL",
+                      "RETURN i"
+                    ]
+                  },
+                  "tone": "bad_if_any"
+                },
+                {
+                  "key": "audit-stream",
+                  "label": "Instances streaming audit events",
+                  "help": "Instances with at least one destination observed active. Streaming is an Ultimate feature; a Community Edition instance must ship audit_json.log another way, and reads zero here.",
+                  "population": [
+                    "MATCH (i:gitlab__gitlab_instance)",
+                    "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance",
+                    "RETURN i"
+                  ],
+                  "finding": [
+                    "MATCH (i:gitlab__gitlab_instance)-[:STREAMS_AUDIT_EVENTS__gitlab]->(d:gitlab__audit_event_destination)",
+                    "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance AND d.data.active = true",
+                    "RETURN i"
+                  ],
+                  "tone": "good_if_any"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cc3b-723f-bd8d-2ba605863f06",
+            "entity_type": "search",
+            "name": "gitlab — components of an instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — components of an instance",
+            "description": "Envelope mode (RETURN the node) so the table receives typed nodes: The stateless GitLab processes of the instance, with the image each runs from, whether it runs in FIPS mode, and its last health verdict. A blank health is not observed, never healthy. Filtered to the page's instance (req-gitlab-page).",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (c:gitlab__gitlab_component)",
+                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "RETURN c"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            },
+            "max_limit": 2000
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cc7a-706f-9411-13f6a7417838",
+            "entity_type": "panel",
+            "name": "Components",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "Components",
+            "slug": "gitlab-components",
+            "description": "The stateless GitLab processes of the instance, with the image each runs from, whether it runs in FIPS mode, and its last health verdict. A blank health is not observed, never healthy.",
+            "view": "tap_web/panels/table_panel.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": false,
+              "height": 360,
+              "quick_filter": true,
+              "default_page_size": 100,
+              "columns": [
+                {
+                  "field": "data.name",
+                  "title": "Name",
+                  "header_tooltip": "The process's name in the deployment.",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.component",
+                  "title": "Component",
+                  "header_tooltip": "Which GitLab component (webservice is Puma; workhorse its HTTP front).",
+                  "headerSort": true,
+                  "width": 130
+                },
+                {
+                  "field": "data.image",
+                  "title": "Image",
+                  "header_tooltip": "The container image the process runs from.",
+                  "headerSort": true,
+                  "widthGrow": 3
+                },
+                {
+                  "field": "data.version",
+                  "title": "Version",
+                  "header_tooltip": "The version the process reports.",
+                  "headerSort": true,
+                  "width": 100
+                },
+                {
+                  "field": "data.fips_enabled",
+                  "title": "FIPS",
+                  "header_tooltip": "Whether the process runs in FIPS mode. – is not observed.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.health",
+                  "title": "Health",
+                  "header_tooltip": "The last health verdict (for example /-/readiness). Blank is not observed.",
+                  "headerSort": true,
+                  "formatter": "toneBadge",
+                  "formatter_params": {
+                    "tones": {
+                      "healthy": "good",
+                      "degraded": "warn",
+                      "unhealthy": "bad"
+                    }
+                  },
+                  "width": 110,
+                  "align": "center"
+                },
+                {
+                  "field": "data.health_observed_at",
+                  "title": "Checked",
+                  "header_tooltip": "When the health verdict was observed.",
+                  "headerSort": true,
+                  "formatter": "datetime",
+                  "width": 170
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-0710-75b0-904c-5eb5ee8eb7b2",
+            "entity_type": "search",
+            "name": "gitlab — gitaly of an instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — gitaly of an instance",
+            "description": "Envelope mode (RETURN the node) so the table receives typed nodes: The Gitaly nodes: the one stateful GitLab process, which keeps every repository on its own volume. GitLab supports only local block storage for it, never NFS or EFS; the deployment graph shows the volume. Filtered to the page's instance (req-gitlab-page).",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (g:gitlab__gitaly_node)",
+                "WHERE g.data.instance_name STARTS_WITH $instance AND g.data.instance_name ENDS_WITH $instance",
+                "RETURN g"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            },
+            "max_limit": 2000
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-0773-700c-9c03-51a0ade5740f",
+            "entity_type": "panel",
+            "name": "Gitaly",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "Gitaly",
+            "slug": "gitlab-gitaly",
+            "description": "The Gitaly nodes: the one stateful GitLab process, which keeps every repository on its own volume. GitLab supports only local block storage for it, never NFS or EFS; the deployment graph shows the volume.",
+            "view": "tap_web/panels/table_panel.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": false,
+              "height": 360,
+              "quick_filter": true,
+              "default_page_size": 100,
+              "columns": [
+                {
+                  "field": "data.name",
+                  "title": "Name",
+                  "header_tooltip": "The node's name in the deployment.",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.storage_names",
+                  "title": "Storages",
+                  "header_tooltip": "The repository storages it serves.",
+                  "headerSort": true,
+                  "formatter": "json",
+                  "width": 140
+                },
+                {
+                  "field": "data.deployment_mode",
+                  "title": "Mode",
+                  "header_tooltip": "standalone or praefect_cluster.",
+                  "headerSort": true,
+                  "width": 140
+                },
+                {
+                  "field": "data.image",
+                  "title": "Image",
+                  "header_tooltip": "The container image it runs from.",
+                  "headerSort": true,
+                  "widthGrow": 3
+                },
+                {
+                  "field": "data.version",
+                  "title": "Version",
+                  "header_tooltip": "The version it reports.",
+                  "headerSort": true,
+                  "width": 100
+                },
+                {
+                  "field": "data.fips_enabled",
+                  "title": "FIPS",
+                  "header_tooltip": "Whether it runs in FIPS mode. – is not observed.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.health",
+                  "title": "Health",
+                  "header_tooltip": "The last health verdict. Blank is not observed.",
+                  "headerSort": true,
+                  "formatter": "toneBadge",
+                  "formatter_params": {
+                    "tones": {
+                      "healthy": "good",
+                      "degraded": "warn",
+                      "unhealthy": "bad"
+                    }
+                  },
+                  "width": 110,
+                  "align": "center"
+                },
+                {
+                  "field": "data.health_observed_at",
+                  "title": "Checked",
+                  "header_tooltip": "When the health verdict was observed.",
+                  "headerSort": true,
+                  "formatter": "datetime",
+                  "width": 170
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-ccf5-768f-8764-e5af1170b11a",
+            "entity_type": "search",
+            "name": "gitlab — runners of an instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — runners of an instance",
+            "description": "Envelope mode (RETURN the node) so the table receives typed nodes: Runner registrations: whose jobs each may take. An instance runner that takes untagged jobs from unprotected refs runs anyone's pipeline. Filtered to the page's instance (req-gitlab-page).",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (r:gitlab__gitlab_runner)",
+                "WHERE r.data.instance_name STARTS_WITH $instance AND r.data.instance_name ENDS_WITH $instance",
+                "RETURN r"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            },
+            "max_limit": 2000
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cd32-7624-a1ee-915e23489f61",
+            "entity_type": "panel",
+            "name": "Runners",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "Runners",
+            "slug": "gitlab-runners",
+            "description": "Runner registrations: whose jobs each may take. An instance runner that takes untagged jobs from unprotected refs runs anyone's pipeline.",
+            "view": "tap_web/panels/table_panel.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": false,
+              "height": 360,
+              "quick_filter": true,
+              "default_page_size": 100,
+              "columns": [
+                {
+                  "field": "data.name",
+                  "title": "Runner",
+                  "header_tooltip": "The runner's description.",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.runner_type",
+                  "title": "Scope",
+                  "header_tooltip": "instance_type, group_type or project_type.",
+                  "headerSort": true,
+                  "formatter": "toneBadge",
+                  "formatter_params": {
+                    "tones": {
+                      "instance_type": "warn",
+                      "group_type": "muted",
+                      "project_type": "muted"
+                    },
+                    "labels": {
+                      "instance_type": "instance",
+                      "group_type": "group",
+                      "project_type": "project"
+                    }
+                  },
+                  "width": 110
+                },
+                {
+                  "field": "data.tag_list",
+                  "title": "Tags",
+                  "header_tooltip": "Tags a job must carry to be picked up. – is not observed.",
+                  "headerSort": true,
+                  "formatter": "json",
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.run_untagged",
+                  "title": "Untagged",
+                  "header_tooltip": "Whether the runner also takes jobs with no tags.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.access_level",
+                  "title": "Refs",
+                  "header_tooltip": "ref_protected: only protected branches and tags. not_protected: any ref.",
+                  "headerSort": true,
+                  "formatter": "toneBadge",
+                  "formatter_params": {
+                    "tones": {
+                      "ref_protected": "good",
+                      "not_protected": "warn"
+                    },
+                    "labels": {
+                      "ref_protected": "protected only",
+                      "not_protected": "any ref"
+                    }
+                  },
+                  "width": 130
+                },
+                {
+                  "field": "data.locked",
+                  "title": "Locked",
+                  "header_tooltip": "Whether a project runner is locked to its projects.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.paused",
+                  "title": "Paused",
+                  "header_tooltip": "Whether the runner takes no jobs.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.status",
+                  "title": "Status",
+                  "header_tooltip": "GitLab's contact status.",
+                  "headerSort": true,
+                  "formatter": "toneBadge",
+                  "formatter_params": {
+                    "tones": {
+                      "online": "good",
+                      "offline": "warn",
+                      "stale": "bad",
+                      "never_contacted": "muted"
+                    }
+                  },
+                  "width": 120
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cdae-71f5-a46d-24c58ed75737",
+            "entity_type": "search",
+            "name": "gitlab — runner managers of an instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — runner managers of an instance",
+            "description": "Envelope mode (RETURN the node) so the table receives typed nodes: The runner processes: which executor each uses, whether it runs jobs privileged, and whether GitLab hears from it. Filtered to the page's instance (req-gitlab-page).",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (m:gitlab__runner_manager)",
+                "WHERE m.data.instance_name STARTS_WITH $instance AND m.data.instance_name ENDS_WITH $instance",
+                "RETURN m"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            },
+            "max_limit": 2000
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cdea-720f-b87b-f4b7d9e876dd",
+            "entity_type": "panel",
+            "name": "Runner managers",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "Runner managers",
+            "slug": "gitlab-managers",
+            "description": "The runner processes: which executor each uses, whether it runs jobs privileged, and whether GitLab hears from it.",
+            "view": "tap_web/panels/table_panel.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": false,
+              "height": 360,
+              "quick_filter": true,
+              "default_page_size": 100,
+              "columns": [
+                {
+                  "field": "data.name",
+                  "title": "Manager",
+                  "header_tooltip": "The manager's name in the deployment.",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.executor",
+                  "title": "Executor",
+                  "header_tooltip": "The executor in config.toml (custom + fargate driver runs each job as a Fargate task).",
+                  "headerSort": true,
+                  "width": 130
+                },
+                {
+                  "field": "data.custom_driver",
+                  "title": "Driver",
+                  "header_tooltip": "For the custom executor, the driver it calls.",
+                  "headerSort": true,
+                  "width": 100
+                },
+                {
+                  "field": "data.privileged",
+                  "title": "Privileged",
+                  "header_tooltip": "Whether jobs run privileged. – is not observed (config.toml; the API does not expose it).",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.concurrent",
+                  "title": "Concurrent",
+                  "header_tooltip": "Jobs run at once.",
+                  "headerSort": true,
+                  "width": 110,
+                  "align": "right"
+                },
+                {
+                  "field": "data.image",
+                  "title": "Image",
+                  "header_tooltip": "The container image the manager runs from.",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.fips_enabled",
+                  "title": "FIPS",
+                  "header_tooltip": "Whether the manager runs in FIPS mode.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.status",
+                  "title": "Status",
+                  "header_tooltip": "GitLab's contact status.",
+                  "headerSort": true,
+                  "formatter": "toneBadge",
+                  "formatter_params": {
+                    "tones": {
+                      "online": "good",
+                      "offline": "warn",
+                      "stale": "bad",
+                      "never_contacted": "muted"
+                    }
+                  },
+                  "width": 120
+                },
+                {
+                  "field": "data.contacted_at",
+                  "title": "Last contact",
+                  "header_tooltip": "When GitLab last heard from it.",
+                  "headerSort": true,
+                  "formatter": "datetime",
+                  "width": 170
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-ce63-75a1-89c7-ef9a7544760e",
+            "entity_type": "search",
+            "name": "gitlab — projects of an instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — projects of an instance",
+            "description": "Envelope mode (RETURN the node) so the table receives typed nodes: Projects and the settings that decide who can run what in them. Filtered to the page's instance (req-gitlab-page).",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (p:gitlab__gitlab_project)",
+                "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance",
+                "RETURN p"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            },
+            "max_limit": 2000
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-ced4-7067-bf1b-b0dccfacf6aa",
+            "entity_type": "panel",
+            "name": "Projects",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "Projects",
+            "slug": "gitlab-projects",
+            "description": "Projects and the settings that decide who can run what in them.",
+            "view": "tap_web/panels/table_panel.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": false,
+              "height": 360,
+              "quick_filter": true,
+              "default_page_size": 100,
+              "columns": [
+                {
+                  "field": "data.full_path",
+                  "title": "Project",
+                  "header_tooltip": "The project's path with namespace.",
+                  "headerSort": true,
+                  "widthGrow": 3
+                },
+                {
+                  "field": "data.visibility",
+                  "title": "Visibility",
+                  "header_tooltip": "Who can see it.",
+                  "headerSort": true,
+                  "formatter": "toneBadge",
+                  "formatter_params": {
+                    "tones": {
+                      "private": "good",
+                      "internal": "muted",
+                      "public": "warn"
+                    }
+                  },
+                  "width": 110
+                },
+                {
+                  "field": "data.default_branch",
+                  "title": "Default branch",
+                  "header_tooltip": "The default branch.",
+                  "headerSort": true,
+                  "width": 140
+                },
+                {
+                  "field": "data.job_token_inbound_enabled",
+                  "title": "Job-token allowlist",
+                  "header_tooltip": "Whether the CI_JOB_TOKEN inbound allowlist is enforced. ✕ means any project's job token can reach this one.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.fork_pipelines_in_parent",
+                  "title": "Fork pipelines here",
+                  "header_tooltip": "Whether fork merge-request pipelines run in this project with its variables and runners.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.shared_runners_enabled",
+                  "title": "Instance runners",
+                  "header_tooltip": "Whether instance runners may take its jobs.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.archived",
+                  "title": "Archived",
+                  "header_tooltip": "Whether the project is read-only.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cf7d-7287-a224-66501f5c1fc5",
+            "entity_type": "search",
+            "name": "gitlab — protected branches of an instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — protected branches of an instance",
+            "description": "Envelope mode (RETURN the node) so the table receives typed nodes: Protected-branch rules: who may push, merge or unprotect (0 no one, 30 developers, 40 maintainers, 60 administrators). Grants to a named user, group or deploy key are edges and are not listed here. Filtered to the page's instance (req-gitlab-page).",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (b:gitlab__protected_branch)",
+                "WHERE b.data.instance_name STARTS_WITH $instance AND b.data.instance_name ENDS_WITH $instance",
+                "RETURN b"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            },
+            "max_limit": 2000
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cfbd-727a-8b3e-d565cf1d0a61",
+            "entity_type": "panel",
+            "name": "Protected branches",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "Protected branches",
+            "slug": "gitlab-branches",
+            "description": "Protected-branch rules: who may push, merge or unprotect (0 no one, 30 developers, 40 maintainers, 60 administrators). Grants to a named user, group or deploy key are edges and are not listed here.",
+            "view": "tap_web/panels/table_panel.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": false,
+              "height": 360,
+              "quick_filter": true,
+              "default_page_size": 100,
+              "columns": [
+                {
+                  "field": "data.project_path",
+                  "title": "Project",
+                  "header_tooltip": "The project (or group) the rule belongs to.",
+                  "headerSort": true,
+                  "widthGrow": 3
+                },
+                {
+                  "field": "data.name",
+                  "title": "Branch",
+                  "header_tooltip": "The branch or wildcard protected.",
+                  "headerSort": true,
+                  "width": 160
+                },
+                {
+                  "field": "data.push_access_levels",
+                  "title": "Push",
+                  "header_tooltip": "Roles allowed to push.",
+                  "headerSort": true,
+                  "formatter": "json",
+                  "width": 110
+                },
+                {
+                  "field": "data.merge_access_levels",
+                  "title": "Merge",
+                  "header_tooltip": "Roles allowed to merge.",
+                  "headerSort": true,
+                  "formatter": "json",
+                  "width": 110
+                },
+                {
+                  "field": "data.unprotect_access_levels",
+                  "title": "Unprotect",
+                  "header_tooltip": "Roles allowed to unprotect.",
+                  "headerSort": true,
+                  "formatter": "json",
+                  "width": 110
+                },
+                {
+                  "field": "data.allow_force_push",
+                  "title": "Force-push",
+                  "header_tooltip": "Whether force-push is allowed.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.code_owner_approval_required",
+                  "title": "Code owners",
+                  "header_tooltip": "Whether Code Owner approval is required.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d03f-726c-bd91-21d51a7c67d1",
+            "entity_type": "search",
+            "name": "gitlab — environments of an instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — environments of an instance",
+            "description": "Envelope mode (RETURN the node) so the table receives typed nodes: Deployment environments and their protection (protected environments are Premium and up; on Community Edition the protection columns read not observed). Filtered to the page's instance (req-gitlab-page).",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (e:gitlab__gitlab_environment)",
+                "WHERE e.data.instance_name STARTS_WITH $instance AND e.data.instance_name ENDS_WITH $instance",
+                "RETURN e"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            },
+            "max_limit": 2000
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d07d-71d3-a6b2-02c9c6b6c17d",
+            "entity_type": "panel",
+            "name": "Environments",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "Environments",
+            "slug": "gitlab-environments",
+            "description": "Deployment environments and their protection (protected environments are Premium and up; on Community Edition the protection columns read not observed).",
+            "view": "tap_web/panels/table_panel.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": false,
+              "height": 360,
+              "quick_filter": true,
+              "default_page_size": 100,
+              "columns": [
+                {
+                  "field": "data.project_path",
+                  "title": "Project",
+                  "header_tooltip": "The project the environment belongs to.",
+                  "headerSort": true,
+                  "widthGrow": 3
+                },
+                {
+                  "field": "data.name",
+                  "title": "Environment",
+                  "header_tooltip": "The environment's name.",
+                  "headerSort": true,
+                  "width": 150
+                },
+                {
+                  "field": "data.tier",
+                  "title": "Tier",
+                  "header_tooltip": "GitLab's deployment tier.",
+                  "headerSort": true,
+                  "formatter": "toneBadge",
+                  "formatter_params": {
+                    "tones": {
+                      "production": "warn"
+                    }
+                  },
+                  "width": 120
+                },
+                {
+                  "field": "data.protected",
+                  "title": "Protected",
+                  "header_tooltip": "Whether the environment is protected.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.required_approval_count",
+                  "title": "Approvals",
+                  "header_tooltip": "Approvals a deployment needs.",
+                  "headerSort": true,
+                  "width": 100,
+                  "align": "right"
+                },
+                {
+                  "field": "data.deploy_access_levels",
+                  "title": "Deployers",
+                  "header_tooltip": "Roles allowed to deploy.",
+                  "headerSort": true,
+                  "formatter": "json",
+                  "width": 110
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d0f6-709c-8975-2fb98f6674aa",
+            "entity_type": "search",
+            "name": "gitlab — ci/cd variables of an instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — ci/cd variables of an instance",
+            "description": "Envelope mode (RETURN the node) so the table receives typed nodes: Every CI/CD variable at instance, group and project level, with the protections that decide which jobs receive it. Values are never collected. Filtered to the page's instance (req-gitlab-page).",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (v:gitlab__ci_variable)",
+                "WHERE v.data.instance_name STARTS_WITH $instance AND v.data.instance_name ENDS_WITH $instance",
+                "RETURN v"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            },
+            "max_limit": 2000
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d133-7544-99e7-3cddf105d325",
+            "entity_type": "panel",
+            "name": "CI/CD variables",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "CI/CD variables",
+            "slug": "gitlab-variables",
+            "description": "Every CI/CD variable at instance, group and project level, with the protections that decide which jobs receive it. Values are never collected.",
+            "view": "tap_web/panels/table_panel.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": false,
+              "height": 360,
+              "quick_filter": true,
+              "default_page_size": 100,
+              "columns": [
+                {
+                  "field": "data.scope",
+                  "title": "Level",
+                  "header_tooltip": "Where the variable is defined.",
+                  "headerSort": true,
+                  "width": 100
+                },
+                {
+                  "field": "data.scope_path",
+                  "title": "Defined on",
+                  "header_tooltip": "The group or project path (blank for instance level).",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.key",
+                  "title": "Key",
+                  "header_tooltip": "The variable's name.",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.environment_scope",
+                  "title": "Environments",
+                  "header_tooltip": "Which environments receive it.",
+                  "headerSort": true,
+                  "width": 130
+                },
+                {
+                  "field": "data.protected",
+                  "title": "Protected",
+                  "header_tooltip": "Only protected refs receive it.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.masked",
+                  "title": "Masked",
+                  "header_tooltip": "Masked in job logs.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.hidden",
+                  "title": "Hidden",
+                  "header_tooltip": "Hidden in the UI after creation.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.variable_type",
+                  "title": "Type",
+                  "header_tooltip": "env_var or file.",
+                  "headerSort": true,
+                  "width": 90
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d1c8-71bf-acc5-4876f7c0ce0c",
+            "entity_type": "search",
+            "name": "gitlab — access tokens of an instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — access tokens of an instance",
+            "description": "Envelope mode (RETURN the node) so the table receives typed nodes: Personal, group, project and impersonation tokens: scopes, role and expiry. The secret is never collected. Filtered to the page's instance (req-gitlab-page).",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (t:gitlab__access_token)",
+                "WHERE t.data.instance_name STARTS_WITH $instance AND t.data.instance_name ENDS_WITH $instance",
+                "RETURN t"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            },
+            "max_limit": 2000
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d204-7589-ac1c-e6d76b9508cb",
+            "entity_type": "panel",
+            "name": "Access tokens",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "Access tokens",
+            "slug": "gitlab-tokens",
+            "description": "Personal, group, project and impersonation tokens: scopes, role and expiry. The secret is never collected.",
+            "view": "tap_web/panels/table_panel.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": false,
+              "height": 360,
+              "quick_filter": true,
+              "default_page_size": 100,
+              "columns": [
+                {
+                  "field": "data.owner_path",
+                  "title": "Owner",
+                  "header_tooltip": "The user, group or project the token belongs to.",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.name",
+                  "title": "Token",
+                  "header_tooltip": "The token's name.",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.token_type",
+                  "title": "Kind",
+                  "header_tooltip": "personal, impersonation, group or project.",
+                  "headerSort": true,
+                  "width": 120
+                },
+                {
+                  "field": "data.scopes",
+                  "title": "Scopes",
+                  "header_tooltip": "What the token may do.",
+                  "headerSort": true,
+                  "formatter": "json",
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.expires",
+                  "title": "Expires",
+                  "header_tooltip": "✕ means it never expires.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.expires_at",
+                  "title": "Expiry",
+                  "header_tooltip": "When it expires.",
+                  "headerSort": true,
+                  "formatter": "datetime",
+                  "width": 170
+                },
+                {
+                  "field": "data.last_used_at",
+                  "title": "Last used",
+                  "header_tooltip": "When it was last used.",
+                  "headerSort": true,
+                  "formatter": "datetime",
+                  "width": 170
+                },
+                {
+                  "field": "data.revoked",
+                  "title": "Revoked",
+                  "header_tooltip": "Whether it has been revoked.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-07ec-761e-93de-aedf26baab77",
+            "entity_type": "search",
+            "name": "gitlab — deploy keys of an instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — deploy keys of an instance",
+            "description": "Envelope mode (RETURN the node) so the table receives typed nodes: SSH keys that read (and, where a project allows it, push to) repositories without a user account. Whether a key may push is per project, on the project's link to it. Filtered to the page's instance (req-gitlab-page).",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (k:gitlab__deploy_key)",
+                "WHERE k.data.instance_name STARTS_WITH $instance AND k.data.instance_name ENDS_WITH $instance",
+                "RETURN k"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            },
+            "max_limit": 2000
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-0826-74bc-b377-a92203e5ecc6",
+            "entity_type": "panel",
+            "name": "Deploy keys",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "Deploy keys",
+            "slug": "gitlab-deploy-keys",
+            "description": "SSH keys that read (and, where a project allows it, push to) repositories without a user account. Whether a key may push is per project, on the project's link to it.",
+            "view": "tap_web/panels/table_panel.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": false,
+              "height": 360,
+              "quick_filter": true,
+              "default_page_size": 100,
+              "columns": [
+                {
+                  "field": "data.name",
+                  "title": "Key",
+                  "header_tooltip": "The key's title.",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.fingerprint_sha256",
+                  "title": "Fingerprint",
+                  "header_tooltip": "The key's SHA256 fingerprint.",
+                  "headerSort": true,
+                  "formatter": "ellipsisSuffix",
+                  "width": 130
+                },
+                {
+                  "field": "data.expires",
+                  "title": "Expires",
+                  "header_tooltip": "✕ means it never expires.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.expires_at",
+                  "title": "Expiry",
+                  "header_tooltip": "When it expires.",
+                  "headerSort": true,
+                  "formatter": "datetime",
+                  "width": 170
+                },
+                {
+                  "field": "data.created_at",
+                  "title": "Added",
+                  "header_tooltip": "When it was added.",
+                  "headerSort": true,
+                  "formatter": "datetime",
+                  "width": 170
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-0892-7482-9e26-f7f2dc685bca",
+            "entity_type": "search",
+            "name": "gitlab — deploy tokens of an instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — deploy tokens of an instance",
+            "description": "Envelope mode (RETURN the node) so the table receives typed nodes: Username-and-token pairs a group or project minted for reading repositories and reading or writing its registries. Filtered to the page's instance (req-gitlab-page).",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (d:gitlab__deploy_token)",
+                "WHERE d.data.instance_name STARTS_WITH $instance AND d.data.instance_name ENDS_WITH $instance",
+                "RETURN d"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            },
+            "max_limit": 2000
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-08c7-7137-bbb5-8dfa86f69765",
+            "entity_type": "panel",
+            "name": "Deploy tokens",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "Deploy tokens",
+            "slug": "gitlab-deploy-tokens",
+            "description": "Username-and-token pairs a group or project minted for reading repositories and reading or writing its registries.",
+            "view": "tap_web/panels/table_panel.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": false,
+              "height": 360,
+              "quick_filter": true,
+              "default_page_size": 100,
+              "columns": [
+                {
+                  "field": "data.scope_path",
+                  "title": "Issued by",
+                  "header_tooltip": "The group or project that issued it.",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.name",
+                  "title": "Token",
+                  "header_tooltip": "The token's name.",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.scopes",
+                  "title": "Scopes",
+                  "header_tooltip": "What it may do.",
+                  "headerSort": true,
+                  "formatter": "json",
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.expires",
+                  "title": "Expires",
+                  "header_tooltip": "✕ means it never expires.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.expires_at",
+                  "title": "Expiry",
+                  "header_tooltip": "When it expires.",
+                  "headerSort": true,
+                  "formatter": "datetime",
+                  "width": 170
+                },
+                {
+                  "field": "data.revoked",
+                  "title": "Revoked",
+                  "header_tooltip": "Whether it has been revoked.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d370-7343-883a-59845f2bac02",
+            "entity_type": "search",
+            "name": "gitlab — accounts of an instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — accounts of an instance",
+            "description": "Envelope mode (RETURN the node) so the table receives typed nodes: User accounts: people, service accounts and bots, with administrator rights and two-factor status. Filtered to the page's instance (req-gitlab-page).",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (u:gitlab__gitlab_user)",
+                "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance",
+                "RETURN u"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            },
+            "max_limit": 2000
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d3ab-77ff-97c7-f1f48edc3f13",
+            "entity_type": "panel",
+            "name": "Accounts",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "Accounts",
+            "slug": "gitlab-users",
+            "description": "User accounts: people, service accounts and bots, with administrator rights and two-factor status.",
+            "view": "tap_web/panels/table_panel.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": false,
+              "height": 360,
+              "quick_filter": true,
+              "default_page_size": 100,
+              "columns": [
+                {
+                  "field": "data.username",
+                  "title": "Username",
+                  "header_tooltip": "The account's username.",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.user_type",
+                  "title": "Type",
+                  "header_tooltip": "human, service_account, project_bot, …",
+                  "headerSort": true,
+                  "width": 140
+                },
+                {
+                  "field": "data.state",
+                  "title": "State",
+                  "header_tooltip": "active, blocked, deactivated, …",
+                  "headerSort": true,
+                  "formatter": "toneBadge",
+                  "formatter_params": {
+                    "tones": {
+                      "active": "good",
+                      "blocked": "muted",
+                      "deactivated": "muted",
+                      "banned": "bad"
+                    }
+                  },
+                  "width": 110
+                },
+                {
+                  "field": "data.is_admin",
+                  "title": "Admin",
+                  "header_tooltip": "Instance administrator.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.is_auditor",
+                  "title": "Auditor",
+                  "header_tooltip": "Read-only access to everything.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.two_factor_enabled",
+                  "title": "2FA",
+                  "header_tooltip": "GitLab two-factor authentication enabled.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.external",
+                  "title": "External",
+                  "header_tooltip": "Sees only what it is given.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.last_sign_in_at",
+                  "title": "Last sign-in",
+                  "header_tooltip": "When it last signed in.",
+                  "headerSort": true,
+                  "formatter": "datetime",
+                  "width": 170
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d42c-77a7-8875-3339b82038e8",
+            "entity_type": "search",
+            "name": "gitlab — sign-in providers of an instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — sign-in providers of an instance",
+            "description": "Envelope mode (RETURN the node) so the table receives typed nodes: Where sign-in is delegated, and whether a first sign-in can create an account on its own. Filtered to the page's instance (req-gitlab-page).",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (s:gitlab__sso_provider)",
+                "WHERE s.data.instance_name STARTS_WITH $instance AND s.data.instance_name ENDS_WITH $instance",
+                "RETURN s"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            },
+            "max_limit": 2000
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d467-7424-a6ab-736a044c49e2",
+            "entity_type": "panel",
+            "name": "Sign-in providers",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "Sign-in providers",
+            "slug": "gitlab-sign-in",
+            "description": "Where sign-in is delegated, and whether a first sign-in can create an account on its own.",
+            "view": "tap_web/panels/table_panel.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": false,
+              "height": 360,
+              "quick_filter": true,
+              "default_page_size": 100,
+              "columns": [
+                {
+                  "field": "data.name",
+                  "title": "Provider",
+                  "header_tooltip": "The provider's name in the configuration.",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.protocol",
+                  "title": "Protocol",
+                  "header_tooltip": "saml, openid_connect or ldap.",
+                  "headerSort": true,
+                  "width": 130
+                },
+                {
+                  "field": "data.enforced",
+                  "title": "Only way in",
+                  "header_tooltip": "Whether password sign-in is disabled in its favour.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.auto_create_users",
+                  "title": "Creates accounts",
+                  "header_tooltip": "Whether a first sign-in creates an account.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.block_auto_created_users",
+                  "title": "New accounts blocked",
+                  "header_tooltip": "Whether such accounts start blocked until approved.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                },
+                {
+                  "field": "data.auto_link_user",
+                  "title": "Links by email",
+                  "header_tooltip": "Whether a sign-in links to an existing account by email.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d4fa-76d8-b2b9-26d94d417d9e",
+            "entity_type": "search",
+            "name": "gitlab — audit event streaming of an instance",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "gitlab — audit event streaming of an instance",
+            "description": "Envelope mode (RETURN the node) so the table receives typed nodes: Where each instance or top-level group streams its audit events (Ultimate only). An empty table on a Community Edition instance means the audit log has to leave another way, not that there is nothing to send. Filtered to the page's instance (req-gitlab-page).",
+            "search_type": "gryphon",
+            "root": "node",
+            "definition": {
+              "query": [
+                "MATCH (a:gitlab__audit_event_destination)",
+                "WHERE a.data.instance_name STARTS_WITH $instance AND a.data.instance_name ENDS_WITH $instance",
+                "RETURN a"
+              ]
+            },
+            "input_schema": {
+              "type": "object",
+              "properties": {
+                "instance": {
+                  "type": "string",
+                  "default": "",
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                }
+              },
+              "additionalProperties": false
+            },
+            "max_limit": 2000
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d537-737b-896c-5a323b416f27",
+            "entity_type": "panel",
+            "name": "Audit event streaming",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "Audit event streaming",
+            "slug": "gitlab-audit",
+            "description": "Where each instance or top-level group streams its audit events (Ultimate only). An empty table on a Community Edition instance means the audit log has to leave another way, not that there is nothing to send.",
+            "view": "tap_web/panels/table_panel.html",
+            "editor_view": "",
+            "config": {
+              "hide_header": false,
+              "height": 360,
+              "quick_filter": true,
+              "default_page_size": 100,
+              "columns": [
+                {
+                  "field": "data.name",
+                  "title": "Destination",
+                  "header_tooltip": "The destination's name.",
+                  "headerSort": true,
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.destination_type",
+                  "title": "Kind",
+                  "header_tooltip": "http, aws_s3 or google_cloud_logging.",
+                  "headerSort": true,
+                  "width": 160
+                },
+                {
+                  "field": "data.scope",
+                  "title": "Streams from",
+                  "header_tooltip": "The instance or a top-level group.",
+                  "headerSort": true,
+                  "width": 120
+                },
+                {
+                  "field": "data.destination_url",
+                  "title": "Endpoint",
+                  "header_tooltip": "For HTTP, the endpoint.",
+                  "headerSort": true,
+                  "formatter": "externalLink",
+                  "widthGrow": 2
+                },
+                {
+                  "field": "data.active",
+                  "title": "Active",
+                  "header_tooltip": "Whether streaming is active.",
+                  "headerSort": true,
+                  "formatter": "tickCross",
+                  "align": "center",
+                  "width": 90
+                }
+              ]
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "entity_type": "page",
+            "name": "GitLab",
+            "dimensions": {
+              "tap.graph": "web"
+            }
+          },
+          "node": {
+            "name": "GitLab",
+            "slug": "/gitlab",
+            "nav_weight": 140,
+            "description": "One self-managed GitLab instance's front page for an operator in a FedRAMP 20x environment: the deployment as a picture, the posture tiles, then the tables an assessor asks for (components, runners, projects and their protections, variables, credentials, accounts, sign-in, audit streaming). ?instance=<name> picks the instance; blank shows every instance, which is the single instance when there is one.",
+            "layout": {
+              "full_bleed": true,
+              "columns": {
+                "col-1": {
+                  "width": "1fr",
+                  "rows": {
+                    "row-1": {
+                      "panel-id": "deployment",
+                      "height": "66vh"
+                    },
+                    "row-2": {
+                      "panel-id": "posture",
+                      "height": "auto"
+                    },
+                    "row-3": {
+                      "panel-id": "components",
+                      "height": "auto"
+                    },
+                    "row-4": {
+                      "panel-id": "gitaly",
+                      "height": "auto"
+                    },
+                    "row-5": {
+                      "panel-id": "runners",
+                      "height": "auto"
+                    },
+                    "row-6": {
+                      "panel-id": "managers",
+                      "height": "auto"
+                    },
+                    "row-7": {
+                      "panel-id": "projects",
+                      "height": "auto"
+                    },
+                    "row-8": {
+                      "panel-id": "branches",
+                      "height": "auto"
+                    },
+                    "row-9": {
+                      "panel-id": "environments",
+                      "height": "auto"
+                    },
+                    "row-10": {
+                      "panel-id": "variables",
+                      "height": "auto"
+                    },
+                    "row-11": {
+                      "panel-id": "tokens",
+                      "height": "auto"
+                    },
+                    "row-12": {
+                      "panel-id": "deploy-keys",
+                      "height": "auto"
+                    },
+                    "row-13": {
+                      "panel-id": "deploy-tokens",
+                      "height": "auto"
+                    },
+                    "row-14": {
+                      "panel-id": "users",
+                      "height": "auto"
+                    },
+                    "row-15": {
+                      "panel-id": "sign-in",
+                      "height": "auto"
+                    },
+                    "row-16": {
+                      "panel-id": "audit",
+                      "height": "auto"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "edges": [
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c1f3-7533-b098-196c6379776c",
+            "entity_type": "edge",
+            "name": "gitlab projection USES_ELEVATION gitlab elevation",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c1ad-7512-acba-762f6add9afd",
+            "to_entity_id": "01a0cc75-c175-77c0-afc2-31b5e92e9553",
+            "edge_type": "USES_ELEVATION",
+            "properties": {
+              "hotlink": {
+                "model": "projection",
+                "spec": "projection-elevations",
+                "value": "01a0cc75-c175-77c0-afc2-31b5e92e9553"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c233-766f-a204-efbe700c3ddb",
+            "entity_type": "edge",
+            "name": "gitlab projection USES_DEFAULT_ELEVATION gitlab elevation",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c1ad-7512-acba-762f6add9afd",
+            "to_entity_id": "01a0cc75-c175-77c0-afc2-31b5e92e9553",
+            "edge_type": "USES_DEFAULT_ELEVATION",
+            "properties": {
+              "hotlink": {
+                "model": "projection",
+                "spec": "projection-default-elevation",
+                "value": "01a0cc75-c175-77c0-afc2-31b5e92e9553"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c270-7529-aa5f-f2d2ccfae765",
+            "entity_type": "edge",
+            "name": "gitlab elevation USES_LAYOUT gitlab deployment layout",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c175-77c0-afc2-31b5e92e9553",
+            "to_entity_id": "01a0cc75-c130-7223-a612-9aec9b8f0a5c",
+            "edge_type": "USES_LAYOUT",
+            "properties": {
+              "hotlink": {
+                "model": "elevation",
+                "spec": "elevation-layouts",
+                "value": "01a0cc75-c130-7223-a612-9aec9b8f0a5c"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c78e-7032-966d-3d31d3413563",
+            "entity_type": "edge",
+            "name": "deployment panel USES_PROJECTION gitlab projection",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc75-c1ad-7512-acba-762f6add9afd",
+            "edge_type": "USES_PROJECTION",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c7cc-7719-891f-b3298f20eb69",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-instances",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc75-c2af-738a-82dd-3fba165cd7ad",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-c80c-74e9-b734-e83f0d16bf33",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-processes",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc75-c2e9-743f-bc04-a735486b158a",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-0376-7681-bdb7-dc8bf683a379",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-runs-on-component",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc78-008c-702d-acba-720cf2fdf0cd",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-03d3-757e-88a5-e795afd86348",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-runs-on-gitaly",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc78-00c5-76b8-836e-65a033e598d8",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-0443-736a-9f35-97a7e2cc5b61",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-runs-on-manager",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc78-00f9-749e-a954-d8051fdceef9",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-047f-77a3-9de4-a8e8d8a8164d",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-db-component",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc78-012b-7586-8232-ef5ad0a4a260",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-04b9-77ce-be9e-8f41173c8bd8",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-db-gitaly",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc78-015d-7762-98b9-321914f4daa8",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-04fc-7428-adee-ac12f56a7481",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-redis-component",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc78-0190-7306-b37f-031e7e9aa3a9",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-0533-72a7-bcd6-7dd0f4f1c12f",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-objects-component",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc78-01c2-731c-a09a-8bd0de3ee29f",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-0568-71a1-b017-4b600592c88c",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-objects-manager",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc78-01f8-74c0-ad15-8c685954b3b0",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-05a1-759a-afee-d0d103d9c2bf",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-volume-gitaly",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc78-0231-7218-84a7-f8f56566a3e7",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-05da-7246-ae00-d9c6f879b337",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-secret-component",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc78-026a-7283-8811-4f199afb2f55",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-060f-71c6-afd9-c1b8e7aa3a9f",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-secret-gitaly",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc78-02a2-779e-8d13-f287753b4a16",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-065b-755a-94b8-7c3bb8dd4556",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-secret-manager",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc78-02d7-77a8-9071-febaf412855a",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-069a-7769-9166-fd12211a0da6",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-jobs-manager",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc78-030b-721d-816d-f2ee4e7af2c2",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-06d1-71e0-8f94-9cfbaab8fcb9",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-as-runner-manager",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc78-033f-706f-8101-8abfd53344b4",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-ca3f-761a-9b8c-2ecbacb689bd",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-ingress",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc75-c572-71e0-867e-3617229714eb",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-ca7e-7073-ab25-edcab3b159a7",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-runners",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc75-c5ca-7533-bc05-0c0641a2bbd2",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cabc-762c-9f82-bb574b6dd2cc",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-sso",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc75-c60d-7257-9750-a9482e46125b",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cafe-75af-9c29-8caed517647e",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-saml",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc75-c64d-72d1-b7b4-08ff0d4bbeb6",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cb3d-76c6-bb4b-2909e8f05981",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-oidc",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc75-c68c-7407-a891-cee61b7bf74f",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cb77-71c0-9377-04f04408e067",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-audit",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc75-c6c8-70da-a6e7-8e991ac1ebbf",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cbba-7039-a95a-aff2ac9e2677",
+            "entity_type": "edge",
+            "name": "deployment panel USES_SEARCH s-sinks",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "to_entity_id": "01a0cc75-c70b-7594-8b72-f8db37f1b6e0",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-ccba-75b6-92ec-7915acdeca32",
+            "entity_type": "edge",
+            "name": "Components panel USES_SEARCH its search",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-cc7a-706f-9411-13f6a7417838",
+            "to_entity_id": "01a0cc75-cc3b-723f-bd8d-2ba605863f06",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-07b4-76c6-b516-daed8f033ead",
+            "entity_type": "edge",
+            "name": "Gitaly panel USES_SEARCH its search",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc78-0773-700c-9c03-51a0ade5740f",
+            "to_entity_id": "01a0cc78-0710-75b0-904c-5eb5ee8eb7b2",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cd6c-771c-846f-4235ea9bd2d0",
+            "entity_type": "edge",
+            "name": "Runners panel USES_SEARCH its search",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-cd32-7624-a1ee-915e23489f61",
+            "to_entity_id": "01a0cc75-ccf5-768f-8764-e5af1170b11a",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-ce26-7354-ad35-731067dedc50",
+            "entity_type": "edge",
+            "name": "Runner managers panel USES_SEARCH its search",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-cdea-720f-b87b-f4b7d9e876dd",
+            "to_entity_id": "01a0cc75-cdae-71f5-a46d-24c58ed75737",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cf41-77b0-8004-c8187f414862",
+            "entity_type": "edge",
+            "name": "Projects panel USES_SEARCH its search",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-ced4-7067-bf1b-b0dccfacf6aa",
+            "to_entity_id": "01a0cc75-ce63-75a1-89c7-ef9a7544760e",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-cfff-7055-9a22-113146a2d039",
+            "entity_type": "edge",
+            "name": "Protected branches panel USES_SEARCH its search",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-cfbd-727a-8b3e-d565cf1d0a61",
+            "to_entity_id": "01a0cc75-cf7d-7287-a224-66501f5c1fc5",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d0b9-735c-bbfb-ce199ad9380c",
+            "entity_type": "edge",
+            "name": "Environments panel USES_SEARCH its search",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d07d-71d3-a6b2-02c9c6b6c17d",
+            "to_entity_id": "01a0cc75-d03f-726c-bd91-21d51a7c67d1",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d177-7397-aa95-dd7a3733293e",
+            "entity_type": "edge",
+            "name": "CI/CD variables panel USES_SEARCH its search",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d133-7544-99e7-3cddf105d325",
+            "to_entity_id": "01a0cc75-d0f6-709c-8975-2fb98f6674aa",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d241-726f-8c3e-aba3486b83b0",
+            "entity_type": "edge",
+            "name": "Access tokens panel USES_SEARCH its search",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d204-7589-ac1c-e6d76b9508cb",
+            "to_entity_id": "01a0cc75-d1c8-71bf-acc5-4876f7c0ce0c",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-085c-7090-b470-52733a8283bc",
+            "entity_type": "edge",
+            "name": "Deploy keys panel USES_SEARCH its search",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc78-0826-74bc-b377-a92203e5ecc6",
+            "to_entity_id": "01a0cc78-07ec-761e-93de-aedf26baab77",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-08fc-775e-86d9-a75fe1bc6c88",
+            "entity_type": "edge",
+            "name": "Deploy tokens panel USES_SEARCH its search",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc78-08c7-7137-bbb5-8dfa86f69765",
+            "to_entity_id": "01a0cc78-0892-7482-9e26-f7f2dc685bca",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d3ec-7389-877a-e9711647c743",
+            "entity_type": "edge",
+            "name": "Accounts panel USES_SEARCH its search",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d3ab-77ff-97c7-f1f48edc3f13",
+            "to_entity_id": "01a0cc75-d370-7343-883a-59845f2bac02",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d4ba-710d-bb2a-72f863307c41",
+            "entity_type": "edge",
+            "name": "Sign-in providers panel USES_SEARCH its search",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d467-7424-a6ab-736a044c49e2",
+            "to_entity_id": "01a0cc75-d42c-77a7-8875-3339b82038e8",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d58c-770b-9dc9-b1cf94592245",
+            "entity_type": "edge",
+            "name": "Audit event streaming panel USES_SEARCH its search",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d537-737b-896c-5a323b416f27",
+            "to_entity_id": "01a0cc75-d4fa-76d8-b2b9-26d94d417d9e",
+            "edge_type": "USES_SEARCH",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d60d-74af-810d-ee4a956ed943",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL deployment",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc75-c74d-7451-b200-3514781873b1",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "deployment"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d64d-7206-b54f-8bd18d03ec2f",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL posture",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc75-cbfa-7001-9584-34ec806f39a4",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "posture"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d689-71b5-bfce-8da9676b2f06",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL components",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc75-cc7a-706f-9411-13f6a7417838",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "components"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-0931-722d-b44f-0da102191b97",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL gitaly",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc78-0773-700c-9c03-51a0ade5740f",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "gitaly"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d6c8-7381-8684-bb0d68d6d7c7",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL runners",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc75-cd32-7624-a1ee-915e23489f61",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "runners"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d705-7389-916c-cce9c6c2753d",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL managers",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc75-cdea-720f-b87b-f4b7d9e876dd",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "managers"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d73f-70ca-b8e4-3c5365bb3721",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL projects",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc75-ced4-7067-bf1b-b0dccfacf6aa",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "projects"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d77c-748e-995b-c193dfdd8ec3",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL branches",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc75-cfbd-727a-8b3e-d565cf1d0a61",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "branches"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d7c0-77f1-80c0-a0c13eaeac4b",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL environments",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc75-d07d-71d3-a6b2-02c9c6b6c17d",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "environments"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d7ff-7056-96d5-8a68558bbf80",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL variables",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc75-d133-7544-99e7-3cddf105d325",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "variables"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d851-74c1-838d-a6801cdd517f",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL tokens",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc75-d204-7589-ac1c-e6d76b9508cb",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "tokens"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-0967-718f-9901-6666c812acfc",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL deploy-keys",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc78-0826-74bc-b377-a92203e5ecc6",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "deploy-keys"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc78-099a-7642-8b9f-ea98c1653ab5",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL deploy-tokens",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc78-08c7-7137-bbb5-8dfa86f69765",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "deploy-tokens"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d8dd-7048-a03b-80d89eae81af",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL users",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc75-d3ab-77ff-97c7-f1f48edc3f13",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "users"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d91a-71f1-9c35-26b8efe3eb12",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL sign-in",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc75-d467-7424-a6ab-736a044c49e2",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "sign-in"
+              }
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc75-d958-71aa-bb9a-e6fdf4203291",
+            "entity_type": "edge",
+            "name": "GitLab page USES_PANEL audit",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc75-d5d0-754c-b9b2-e52a49688bed",
+            "to_entity_id": "01a0cc75-d537-737b-896c-5a323b416f27",
+            "edge_type": "USES_PANEL",
+            "properties": {
+              "hotlink": {
+                "model": "page",
+                "spec": "page-panels",
+                "value": "audit"
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

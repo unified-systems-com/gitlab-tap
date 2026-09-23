@@ -1,0 +1,48 @@
+{
+  "slug": "STORES_OBJECTS__gitlab",
+  "name": "Stores Objects",
+  "description": "A component (or a runner manager's cache) writes one type of object to an object store. The target is open: an S3 bucket (aws_core__aws_s3_bucket) here. GitLab recommends one bucket per object type; the registry and backups are configured apart from the consolidated form.",
+  "sources": [
+    "gitlab__gitlab_component",
+    "gitlab__runner_manager"
+  ],
+  "property_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "object_type": {
+        "type": "string",
+        "enum": [
+          "artifacts",
+          "external_diffs",
+          "lfs",
+          "uploads",
+          "packages",
+          "dependency_proxy",
+          "terraform_state",
+          "pages",
+          "ci_secure_files",
+          "ci_catalog_bundles",
+          "backups",
+          "registry",
+          "runner_cache"
+        ],
+        "description": "Which kind of object is stored there."
+      },
+      "auth": {
+        "type": "string",
+        "enum": [
+          "iam_role",
+          "static_keys"
+        ],
+        "description": "How the component authenticates to the store (use_iam_profile, or an access key)."
+      }
+    },
+    "required": [
+      "object_type"
+    ]
+  },
+  "default_dimensions": {
+    "gitlab.plane": "infrastructure"
+  }
+}

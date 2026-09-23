@@ -1,0 +1,15 @@
+{
+  "slug": "ISSUES_DEPLOY_TOKEN__gitlab",
+  "name": "Issues Deploy Token",
+  "description": "A group or project issued this deploy token.",
+  "sources": [
+    "gitlab__gitlab_group",
+    "gitlab__gitlab_project"
+  ],
+  "targets": [
+    "gitlab__deploy_token"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "slug": "RUNS_ON_SERVICE__gitlab",
+  "name": "Runs On Service",
+  "description": "A GitLab process runs on this compute service. The target is left open because what hosts a process is the deployment's choice, not GitLab's: an ECS service (aws_core__aws_ecs_service) in this estate, a Kubernetes deployment or a VM elsewhere.",
+  "sources": [
+    "gitlab__gitlab_component",
+    "gitlab__gitaly_node",
+    "gitlab__runner_manager"
+  ],
+  "property_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "container_name": {
+        "type": "string",
+        "description": "The container in the task or pod that runs the process (a Puma and a Workhorse container share one webservice task)."
+      }
+    }
+  },
+  "default_dimensions": {
+    "gitlab.plane": "infrastructure"
+  }
+}

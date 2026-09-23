@@ -1,0 +1,15 @@
+{
+  "slug": "ALLOWLISTS_JOB_TOKEN__gitlab",
+  "name": "Allowlists Job Token",
+  "description": "A project's CI_JOB_TOKEN inbound allowlist admits jobs from this project or group, which may then use their job token against it.",
+  "sources": [
+    "gitlab__gitlab_project"
+  ],
+  "targets": [
+    "gitlab__gitlab_project",
+    "gitlab__gitlab_group"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

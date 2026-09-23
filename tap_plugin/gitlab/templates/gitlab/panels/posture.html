@@ -1,0 +1,41 @@
+{% comment %}
+gitlab posture strip — req-gitlab-panel-posture. Text carries every state (a count, "clear", "not
+observed", "could not read"); colour is a second channel, never the only one.
+{% endcomment %}
+<section class="glp" aria-label="GitLab posture">
+  {% if strip_error %}
+    <p class="glp-error">{{ strip_error }}</p>
+  {% else %}
+    <header class="glp-head">
+      <h2 class="glp-title">GitLab <span class="glp-instance">· {{ chooser.label }}</span></h2>
+      {% if chooser.options|length > 1 %}
+        <nav class="glp-chooser" aria-label="Instance">
+          <a class="glp-chooser-opt{% if not selected %} is-active{% endif %}" href="{{ chooser.all_href }}">All</a>
+          {% for opt in chooser.options %}<a class="glp-chooser-opt{% if opt.active %} is-active{% endif %}" href="{{ opt.href }}"{% if opt.active %} aria-current="true"{% endif %}>{{ opt.name }}</a>{% endfor %}
+        </nav>
+      {% endif %}
+      {% if chooser.note %}<p class="glp-note">{{ chooser.note }}</p>{% endif %}
+    </header>
+    {% if tiles %}
+      <ul class="glp-tiles">
+        {% for tile in tiles %}
+          <li class="glp-tile glp-tile--{{ tile.state }}" title="{{ tile.help }}">
+            <span class="glp-tile-label">{{ tile.label }}</span>
+            {% if tile.state == "not_observed" %}
+              <span class="glp-tile-value">–</span>
+              <span class="glp-tile-sub">not observed: none on the grid for this instance</span>
+            {% elif tile.state == "error" %}
+              <span class="glp-tile-value">?</span>
+              <span class="glp-tile-sub" title="{{ tile.error }}">could not read</span>
+            {% else %}
+              <span class="glp-tile-value">{{ tile.count }}</span>
+              <span class="glp-tile-sub">of {{ tile.population }}{% if tile.state == "clear" %} · clear{% endif %}{% if tile.secondary_count is not None %} · {{ tile.secondary_count }} {{ tile.secondary_label }}{% endif %}</span>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="glp-empty">No posture questions are configured for this strip.</p>
+    {% endif %}
+  {% endif %}
+</section>

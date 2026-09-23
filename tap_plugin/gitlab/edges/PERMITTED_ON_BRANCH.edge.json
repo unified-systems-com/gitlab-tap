@@ -1,0 +1,34 @@
+{
+  "slug": "PERMITTED_ON_BRANCH__gitlab",
+  "name": "Permitted On Branch",
+  "description": "A specific user, group or deploy key is named in a protected-branch rule as allowed to push, merge or unprotect. Role-based grants live on the rule itself.",
+  "sources": [
+    "gitlab__gitlab_user",
+    "gitlab__gitlab_group",
+    "gitlab__deploy_key"
+  ],
+  "targets": [
+    "gitlab__protected_branch"
+  ],
+  "property_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "push",
+          "merge",
+          "unprotect"
+        ],
+        "description": "What the grant allows."
+      }
+    },
+    "required": [
+      "action"
+    ]
+  },
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

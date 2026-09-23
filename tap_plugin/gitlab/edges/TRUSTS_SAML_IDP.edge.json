@@ -1,0 +1,25 @@
+{
+  "slug": "TRUSTS_SAML_IDP__gitlab",
+  "name": "Trusts SAML IdP",
+  "description": "A SAML sign-in provider trusts assertions from this identity provider. The target is open because no substrate type holds a SAML identity provider yet: an Okta org or any other IdP. OIDC providers use identity_core's TRUSTS_ISSUER instead.",
+  "sources": [
+    "gitlab__sso_provider"
+  ],
+  "property_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "idp_entity_id": {
+        "type": "string",
+        "description": "The IdP's entity ID (issuer) GitLab expects."
+      },
+      "idp_cert_fingerprint_sha256": {
+        "type": "string",
+        "description": "The SHA256 fingerprint of the signing certificate GitLab pins."
+      }
+    }
+  },
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

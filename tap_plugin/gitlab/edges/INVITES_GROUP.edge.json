@@ -1,0 +1,49 @@
+{
+  "slug": "INVITES_GROUP__gitlab",
+  "name": "Invites Group",
+  "description": "A group or project shares itself with another group: every member of the invited group gains the role given, capped at their own.",
+  "sources": [
+    "gitlab__gitlab_group",
+    "gitlab__gitlab_project"
+  ],
+  "targets": [
+    "gitlab__gitlab_group"
+  ],
+  "property_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "role": {
+        "type": "string",
+        "enum": [
+          "no_access",
+          "minimal_access",
+          "guest",
+          "planner",
+          "reporter",
+          "security_manager",
+          "developer",
+          "maintainer",
+          "owner"
+        ],
+        "description": "The role granted, by GitLab's name for it."
+      },
+      "access_level": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 60,
+        "description": "GitLab's numeric access level (0 no access, 5 minimal, 10 guest, 15 planner, 20 reporter, 25 security manager, 30 developer, 40 maintainer, 50 owner)."
+      },
+      "expires_at": {
+        "type": "string",
+        "description": "When the grant expires (ISO 8601). Absent when the grant does not expire or was not observed."
+      }
+    },
+    "required": [
+      "role"
+    ]
+  },
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

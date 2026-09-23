@@ -1,0 +1,15 @@
+{
+  "slug": "AUTHENTICATES_VIA_PROVIDER__gitlab",
+  "name": "Authenticates Via Provider",
+  "description": "An instance (or, on gitlab.com, a group) delegates sign-in to this provider.",
+  "sources": [
+    "gitlab__gitlab_instance",
+    "gitlab__gitlab_group"
+  ],
+  "targets": [
+    "gitlab__sso_provider"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

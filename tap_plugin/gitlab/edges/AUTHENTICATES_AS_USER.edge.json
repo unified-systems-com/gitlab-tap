@@ -1,0 +1,14 @@
+{
+  "slug": "AUTHENTICATES_AS_USER__gitlab",
+  "name": "Authenticates As User",
+  "description": "An access token authenticates as this user: the owner of a personal token, the impersonated user, or the bot user behind a group or project token. Whatever the user can do, the token can do within its scopes.",
+  "sources": [
+    "gitlab__access_token"
+  ],
+  "targets": [
+    "gitlab__gitlab_user"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

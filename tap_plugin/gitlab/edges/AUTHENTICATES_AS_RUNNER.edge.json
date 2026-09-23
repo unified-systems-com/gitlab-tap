@@ -1,0 +1,14 @@
+{
+  "slug": "AUTHENTICATES_AS_RUNNER__gitlab",
+  "name": "Authenticates As Runner",
+  "description": "A runner manager authenticates to GitLab with this runner registration's token, and so takes the jobs the registration may take.",
+  "sources": [
+    "gitlab__runner_manager"
+  ],
+  "targets": [
+    "gitlab__gitlab_runner"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "infrastructure"
+  }
+}

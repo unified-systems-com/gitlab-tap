@@ -1,0 +1,15 @@
+{
+  "slug": "ISSUES_ACCESS_TOKEN__gitlab",
+  "name": "Issues Access Token",
+  "description": "A group or project issued this group or project access token. Personal tokens are reached from their user by AUTHENTICATES_AS_USER.",
+  "sources": [
+    "gitlab__gitlab_group",
+    "gitlab__gitlab_project"
+  ],
+  "targets": [
+    "gitlab__access_token"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

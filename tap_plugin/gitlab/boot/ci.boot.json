@@ -1,8 +1,28 @@
 {
   "version": 1,
-  "description": "gitlab CI record (req-boot-bootstrap-ci-record): the stack this plugin's own tests run in. Installs gitlab alone (it declares no dependencies); the consumer flips self to editable so the checkout under test runs, not the pinned revision. Population is empty: v0 ships no GRIFT. Deliberately excluded: every other plugin, all credentials, anything that reaches the network.",
+  "description": "gitlab CI record (req-boot-bootstrap-ci-record): the stack this plugin's own tests run in. Installs the depends_on closure (identity_core, aws_core; neither declares dependencies of its own) and gitlab itself; the consumer flips self to editable so the checkout under test runs, not the pinned revision. Population seeds gitlab's page bundle, which proves it imports. Deliberately excluded: every other plugin, all credentials, anything that reaches the network.",
   "install": {
     "plugins": [
+      {
+        "slug": "identity_core",
+        "enabled": true,
+        "source": {
+          "type": "git",
+          "url": "https://github.com/unified-systems-com/tap-plugin-identity-core",
+          "rev": "main"
+        },
+        "note": "Vocabulary dependency: owns identity_core__oidc_issuer and TRUSTS_ISSUER, which an OIDC sign-in provider points at. Rides main until it has a tagged release (starter record pinned by rev only)."
+      },
+      {
+        "slug": "aws_core",
+        "enabled": true,
+        "source": {
+          "type": "git",
+          "url": "https://github.com/unified-systems-com/tap-plugin-aws-core",
+          "rev": "main"
+        },
+        "note": "Vocabulary dependency: owns ROUTES_TRAFFIC, which the /gitlab page's ingress search names, and the AWS types the page draws. Rides main until it has a tagged release (starter record pinned by rev only)."
+      },
       {
         "slug": "gitlab",
         "enabled": true,
@@ -17,6 +37,13 @@
   },
   "population": {
     "on_failure": "abort",
-    "steps": []
+    "steps": [
+      {
+        "type": "seed-plugin",
+        "plugin": "gitlab",
+        "enabled": true,
+        "note": "gitlab's own bundle: the /gitlab page, its panels, searches and projection."
+      }
+    ]
   }
 }

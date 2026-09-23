@@ -1,0 +1,1789 @@
+{
+  "metadata": {
+    "grift_version": "0"
+  },
+  "_reserved": {},
+  "batches": [
+    {
+      "batch_entity": {
+        "entity_id": "01a0cc76-9015-7358-a196-cc5978aa4a5f",
+        "entity_type": "batch",
+        "name": "gitlab example deployment (test fixture) v1",
+        "dimensions": {}
+      },
+      "batch_node": {
+        "source": "plugins.gitlab.tests",
+        "name": "gitlab example deployment (test fixture) v1",
+        "description": "A small GitLab on ECS (spec-gitlab-v0.md, Reference deployment): the page tests import it and read it back through the page's own searches. Not a seed; never declared in the manifest."
+      },
+      "nodes": [
+        {
+          "entity": {
+            "entity_id": "01a0cc76-74bd-711e-8851-5dba73c3f330",
+            "entity_type": "gitlab__gitlab_instance",
+            "name": "GitLab",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "GitLab",
+            "edition": "ce",
+            "fips_mode": true,
+            "signup_enabled": false,
+            "password_auth_enabled_for_web": false
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-74fb-741a-9b4e-99451041e2e1",
+            "entity_type": "aws_core__aws_ecs_cluster",
+            "name": "staging · gitlab",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging · gitlab"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7530-7669-a0c7-33e65745acc8",
+            "entity_type": "aws_core__aws_ecs_cluster",
+            "name": "staging · gitlab-ci-jobs",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging · gitlab-ci-jobs"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7567-7319-9a15-73e27292ae59",
+            "entity_type": "aws_core__aws_ecs_service",
+            "name": "gitlab-webservice",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab-webservice",
+            "launch_type": "FARGATE"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7599-7311-be1c-c2f85dac1686",
+            "entity_type": "aws_core__aws_ecs_service",
+            "name": "gitlab-sidekiq",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab-sidekiq",
+            "launch_type": "FARGATE"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-75d5-711c-bccc-7fe9127bac7b",
+            "entity_type": "aws_core__aws_ecs_service",
+            "name": "gitlab-shell",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab-shell",
+            "launch_type": "FARGATE"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-760f-7245-b343-7b2f8a2b5fbe",
+            "entity_type": "aws_core__aws_ecs_service",
+            "name": "gitlab-registry",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab-registry",
+            "launch_type": "FARGATE"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7646-7533-a210-d04ab8c42382",
+            "entity_type": "aws_core__aws_ecs_service",
+            "name": "gitlab-toolbox",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab-toolbox",
+            "launch_type": "FARGATE"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-767f-74d6-99f8-863143c85c74",
+            "entity_type": "aws_core__aws_ecs_service",
+            "name": "gitlab-gitaly",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab-gitaly",
+            "launch_type": "EC2"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-76b3-759a-bd1a-6986bc612b7f",
+            "entity_type": "aws_core__aws_ecs_service",
+            "name": "gitlab-runner-manager",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab-runner-manager",
+            "launch_type": "FARGATE"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "entity_type": "gitlab__gitlab_component",
+            "name": "staging · webservice",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging · webservice",
+            "instance_name": "GitLab",
+            "component": "webservice",
+            "image": "cgr.dev/<org>/gitlab-webservice-ce-fips",
+            "ports": [
+              8080
+            ],
+            "fips_enabled": true,
+            "health_check": "GET /-/readiness"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7721-7097-a8ba-afae2d5113fc",
+            "entity_type": "gitlab__gitlab_component",
+            "name": "staging · workhorse",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging · workhorse",
+            "instance_name": "GitLab",
+            "component": "workhorse",
+            "image": "cgr.dev/<org>/gitlab-workhorse-ce-fips",
+            "ports": [
+              8181
+            ],
+            "fips_enabled": true,
+            "health_check": "GET /-/readiness"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "entity_type": "gitlab__gitlab_component",
+            "name": "staging · sidekiq",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging · sidekiq",
+            "instance_name": "GitLab",
+            "component": "sidekiq",
+            "image": "cgr.dev/<org>/gitlab-sidekiq-ce-fips",
+            "ports": [],
+            "fips_enabled": true,
+            "health_check": ""
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-77ab-7639-bd47-67fd2ab986f0",
+            "entity_type": "gitlab__gitlab_component",
+            "name": "staging · shell",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging · shell",
+            "instance_name": "GitLab",
+            "component": "gitlab_shell",
+            "image": "cgr.dev/<org>/gitlab-shell-fips",
+            "ports": [
+              2222
+            ],
+            "fips_enabled": true,
+            "health_check": ""
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-77e0-7364-829b-ace8ccdbdf3d",
+            "entity_type": "gitlab__gitlab_component",
+            "name": "staging · registry",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging · registry",
+            "instance_name": "GitLab",
+            "component": "registry",
+            "image": "cgr.dev/<org>/gitlab-container-registry-fips",
+            "ports": [
+              5000
+            ],
+            "fips_enabled": true,
+            "health_check": ""
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7817-74f0-8385-cba9979fd0b5",
+            "entity_type": "gitlab__gitlab_component",
+            "name": "staging · toolbox",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging · toolbox",
+            "instance_name": "GitLab",
+            "component": "toolbox",
+            "image": "cgr.dev/<org>/gitlab-toolbox-ce-fips",
+            "ports": [],
+            "fips_enabled": true,
+            "health_check": ""
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-784d-7409-ba40-e8754b076af6",
+            "entity_type": "gitlab__gitaly_node",
+            "name": "staging · gitaly-1",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging · gitaly-1",
+            "instance_name": "GitLab",
+            "storage_names": [
+              "default"
+            ],
+            "deployment_mode": "standalone",
+            "image": "cgr.dev/<org>/gitaly-fips",
+            "fips_enabled": true
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7882-70cc-ae68-807d3129ebcf",
+            "entity_type": "gitlab__runner_manager",
+            "name": "staging · runner-manager",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging · runner-manager",
+            "instance_name": "GitLab",
+            "executor": "custom",
+            "custom_driver": "fargate",
+            "image": "cgr.dev/<org>/gitlab-runner-fips",
+            "privileged": false,
+            "concurrent": 10
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-78b6-7382-8f51-e626dae1eb1b",
+            "entity_type": "gitlab__gitlab_runner",
+            "name": "staging · fargate",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging · fargate",
+            "instance_name": "GitLab",
+            "runner_type": "instance_type",
+            "tag_list": [
+              "fargate"
+            ],
+            "run_untagged": false
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-78ea-7705-80b1-b338c5c3ddd5",
+            "entity_type": "aws_core__aws_alb",
+            "name": "gitlab-https",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab-https",
+            "scheme": "internal"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-791c-7059-87fe-39520bedb321",
+            "entity_type": "aws_core__aws_elb",
+            "name": "gitlab-ssh",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab-ssh",
+            "scheme": "internal"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-794f-74de-85a3-4cc8a02f6457",
+            "entity_type": "aws_core__aws_rds_instance",
+            "name": "gitlab-postgres",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab-postgres",
+            "engine": "postgres",
+            "multi_az": true,
+            "encrypted": true
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7980-7387-a9d4-3d511dc1bc5a",
+            "entity_type": "aws_core__aws_elasticache_cluster",
+            "name": "gitlab-valkey",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab-valkey",
+            "engine": "valkey"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-79b4-76b9-9e55-4d4ae43ff115",
+            "entity_type": "aws_core__aws_s3_bucket",
+            "name": "staging-gitlab-artifacts",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging-gitlab-artifacts"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-79ea-7243-9c17-54fa34607502",
+            "entity_type": "aws_core__aws_s3_bucket",
+            "name": "staging-gitlab-lfs",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging-gitlab-lfs"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7a20-740f-907f-d71e663139ca",
+            "entity_type": "aws_core__aws_s3_bucket",
+            "name": "staging-gitlab-uploads",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging-gitlab-uploads"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7a57-77ca-822a-67572fb7fdbb",
+            "entity_type": "aws_core__aws_s3_bucket",
+            "name": "staging-gitlab-packages",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging-gitlab-packages"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7a8f-71a6-8ffd-84134ca9eaef",
+            "entity_type": "aws_core__aws_s3_bucket",
+            "name": "staging-gitlab-terraform-state",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging-gitlab-terraform-state"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7ac5-701a-bc00-e3e5fc857760",
+            "entity_type": "aws_core__aws_s3_bucket",
+            "name": "staging-gitlab-ci-secure-files",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging-gitlab-ci-secure-files"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7afe-71d0-832c-3dda7de8cb01",
+            "entity_type": "aws_core__aws_s3_bucket",
+            "name": "staging-gitlab-dependency-proxy",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging-gitlab-dependency-proxy"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7b35-766d-9a51-3390ba5bb7cb",
+            "entity_type": "aws_core__aws_s3_bucket",
+            "name": "staging-gitlab-registry",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging-gitlab-registry"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7b6c-7391-b164-e2f65da96148",
+            "entity_type": "aws_core__aws_s3_bucket",
+            "name": "staging-gitlab-backups",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging-gitlab-backups"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7ba1-75b5-b4c3-4ffae178b2a3",
+            "entity_type": "aws_core__aws_s3_bucket",
+            "name": "staging-gitlab-runner-cache",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging-gitlab-runner-cache"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "entity_type": "aws_core__aws_kms_key",
+            "name": "staging · gitlab",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "staging · gitlab"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7c0c-757b-9525-0d3e2fa1a232",
+            "entity_type": "aws_core__aws_secrets_manager_secret",
+            "name": "gitlab/rails-secrets",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab/rails-secrets"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7c43-77d0-b440-9636ac7ffdab",
+            "entity_type": "aws_core__aws_secrets_manager_secret",
+            "name": "gitlab/db-password",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab/db-password"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7c75-7035-be02-ba9ea4620c17",
+            "entity_type": "aws_core__aws_secrets_manager_secret",
+            "name": "gitlab/redis-auth",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab/redis-auth"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7ca9-76e6-add1-7b0187a49872",
+            "entity_type": "aws_core__aws_secrets_manager_secret",
+            "name": "gitlab/gitaly-token",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab/gitaly-token"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7cdb-71fd-8f3e-87bb106a2877",
+            "entity_type": "aws_core__aws_secrets_manager_secret",
+            "name": "gitlab/runner-token",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "gitlab/runner-token"
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7d10-71a7-a2aa-9cf225a453cc",
+            "entity_type": "gitlab__sso_provider",
+            "name": "openid_connect",
+            "dimensions": {}
+          },
+          "node": {
+            "name": "openid_connect",
+            "instance_name": "GitLab",
+            "protocol": "openid_connect",
+            "label": "Okta",
+            "enforced": true,
+            "auto_create_users": true,
+            "block_auto_created_users": true
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7d43-703a-b202-c17185743b50",
+            "entity_type": "identity_core__oidc_issuer",
+            "name": "Okta (staging org)",
+            "dimensions": {}
+          },
+          "node": {
+            "issuer_url": "https://staging.okta.example",
+            "provider": "okta"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7d78-77bf-9eec-634cb31c1dc1",
+            "entity_type": "edge",
+            "name": "instance RUNS_COMPONENT__gitlab c-webservice",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-74bd-711e-8851-5dba73c3f330",
+            "to_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "edge_type": "RUNS_COMPONENT__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7dab-70cb-95e5-dbce2095abe1",
+            "entity_type": "edge",
+            "name": "instance RUNS_COMPONENT__gitlab c-workhorse",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-74bd-711e-8851-5dba73c3f330",
+            "to_entity_id": "01a0cc76-7721-7097-a8ba-afae2d5113fc",
+            "edge_type": "RUNS_COMPONENT__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7de2-754f-aa0c-07a3439bc39c",
+            "entity_type": "edge",
+            "name": "instance RUNS_COMPONENT__gitlab c-sidekiq",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-74bd-711e-8851-5dba73c3f330",
+            "to_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "edge_type": "RUNS_COMPONENT__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7e18-7177-a981-d6e5e438fd03",
+            "entity_type": "edge",
+            "name": "instance RUNS_COMPONENT__gitlab c-shell",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-74bd-711e-8851-5dba73c3f330",
+            "to_entity_id": "01a0cc76-77ab-7639-bd47-67fd2ab986f0",
+            "edge_type": "RUNS_COMPONENT__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7e4d-7610-a49f-4644a9aa1416",
+            "entity_type": "edge",
+            "name": "instance RUNS_COMPONENT__gitlab c-registry",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-74bd-711e-8851-5dba73c3f330",
+            "to_entity_id": "01a0cc76-77e0-7364-829b-ace8ccdbdf3d",
+            "edge_type": "RUNS_COMPONENT__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7e80-705f-b2a5-2f6c06b71c70",
+            "entity_type": "edge",
+            "name": "instance RUNS_COMPONENT__gitlab c-toolbox",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-74bd-711e-8851-5dba73c3f330",
+            "to_entity_id": "01a0cc76-7817-74f0-8385-cba9979fd0b5",
+            "edge_type": "RUNS_COMPONENT__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7eb4-708c-aa2f-cc5d3e65523c",
+            "entity_type": "edge",
+            "name": "instance RUNS_COMPONENT__gitlab gitaly",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-74bd-711e-8851-5dba73c3f330",
+            "to_entity_id": "01a0cc76-784d-7409-ba40-e8754b076af6",
+            "edge_type": "RUNS_COMPONENT__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7eea-753b-bf31-9dd091a43d66",
+            "entity_type": "edge",
+            "name": "c-webservice RUNS_ON_SERVICE__gitlab svc-webservice",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-7567-7319-9a15-73e27292ae59",
+            "edge_type": "RUNS_ON_SERVICE__gitlab",
+            "properties": {
+              "container_name": "webservice"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7f22-7215-abd6-dc635c20158b",
+            "entity_type": "edge",
+            "name": "c-workhorse RUNS_ON_SERVICE__gitlab svc-webservice",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7721-7097-a8ba-afae2d5113fc",
+            "to_entity_id": "01a0cc76-7567-7319-9a15-73e27292ae59",
+            "edge_type": "RUNS_ON_SERVICE__gitlab",
+            "properties": {
+              "container_name": "workhorse"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7f58-7770-8f11-10f2fbae9895",
+            "entity_type": "edge",
+            "name": "c-sidekiq RUNS_ON_SERVICE__gitlab svc-sidekiq",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-7599-7311-be1c-c2f85dac1686",
+            "edge_type": "RUNS_ON_SERVICE__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7f8d-761a-9c0b-4d66ea1899ff",
+            "entity_type": "edge",
+            "name": "c-shell RUNS_ON_SERVICE__gitlab svc-shell",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-77ab-7639-bd47-67fd2ab986f0",
+            "to_entity_id": "01a0cc76-75d5-711c-bccc-7fe9127bac7b",
+            "edge_type": "RUNS_ON_SERVICE__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7fc2-7222-9085-20ebec02ce11",
+            "entity_type": "edge",
+            "name": "c-registry RUNS_ON_SERVICE__gitlab svc-registry",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-77e0-7364-829b-ace8ccdbdf3d",
+            "to_entity_id": "01a0cc76-760f-7245-b343-7b2f8a2b5fbe",
+            "edge_type": "RUNS_ON_SERVICE__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-7ff9-75b2-873c-e162609fbc2e",
+            "entity_type": "edge",
+            "name": "c-toolbox RUNS_ON_SERVICE__gitlab svc-toolbox",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7817-74f0-8385-cba9979fd0b5",
+            "to_entity_id": "01a0cc76-7646-7533-a210-d04ab8c42382",
+            "edge_type": "RUNS_ON_SERVICE__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-802c-77c8-b48c-e6c59d0e6a18",
+            "entity_type": "edge",
+            "name": "gitaly RUNS_ON_SERVICE__gitlab svc-gitaly",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-784d-7409-ba40-e8754b076af6",
+            "to_entity_id": "01a0cc76-767f-74d6-99f8-863143c85c74",
+            "edge_type": "RUNS_ON_SERVICE__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-805f-7781-b6ef-3ffd8afc5249",
+            "entity_type": "edge",
+            "name": "manager RUNS_ON_SERVICE__gitlab svc-runner-manager",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7882-70cc-ae68-807d3129ebcf",
+            "to_entity_id": "01a0cc76-76b3-759a-bd1a-6986bc612b7f",
+            "edge_type": "RUNS_ON_SERVICE__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8091-7415-839d-4b7b7a45eb34",
+            "entity_type": "edge",
+            "name": "alb ROUTES_TRAFFIC__aws_core c-workhorse",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-78ea-7705-80b1-b338c5c3ddd5",
+            "to_entity_id": "01a0cc76-7721-7097-a8ba-afae2d5113fc",
+            "edge_type": "ROUTES_TRAFFIC__aws_core",
+            "properties": {
+              "port": 8181
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-80c3-74ca-98f5-950935e7542b",
+            "entity_type": "edge",
+            "name": "alb ROUTES_TRAFFIC__aws_core c-registry",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-78ea-7705-80b1-b338c5c3ddd5",
+            "to_entity_id": "01a0cc76-77e0-7364-829b-ace8ccdbdf3d",
+            "edge_type": "ROUTES_TRAFFIC__aws_core",
+            "properties": {
+              "port": 5000
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-80f5-774c-97bc-61397c1ff3df",
+            "entity_type": "edge",
+            "name": "nlb ROUTES_TRAFFIC__aws_core c-shell",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-791c-7059-87fe-39520bedb321",
+            "to_entity_id": "01a0cc76-77ab-7639-bd47-67fd2ab986f0",
+            "edge_type": "ROUTES_TRAFFIC__aws_core",
+            "properties": {
+              "port": 2222
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8129-74ec-a622-35f8430bef14",
+            "entity_type": "edge",
+            "name": "c-webservice CALLS_GITALY__gitlab gitaly",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-784d-7409-ba40-e8754b076af6",
+            "edge_type": "CALLS_GITALY__gitlab",
+            "properties": {
+              "storage_names": [
+                "default"
+              ],
+              "tls": true
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-815b-7448-bd81-37068c973931",
+            "entity_type": "edge",
+            "name": "c-workhorse CALLS_GITALY__gitlab gitaly",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7721-7097-a8ba-afae2d5113fc",
+            "to_entity_id": "01a0cc76-784d-7409-ba40-e8754b076af6",
+            "edge_type": "CALLS_GITALY__gitlab",
+            "properties": {
+              "storage_names": [
+                "default"
+              ],
+              "tls": true
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-818e-72e7-9851-dda7a04cd759",
+            "entity_type": "edge",
+            "name": "c-sidekiq CALLS_GITALY__gitlab gitaly",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-784d-7409-ba40-e8754b076af6",
+            "edge_type": "CALLS_GITALY__gitlab",
+            "properties": {
+              "storage_names": [
+                "default"
+              ],
+              "tls": true
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-81c1-77ad-8095-7b1e32b420a0",
+            "entity_type": "edge",
+            "name": "c-shell CALLS_GITALY__gitlab gitaly",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-77ab-7639-bd47-67fd2ab986f0",
+            "to_entity_id": "01a0cc76-784d-7409-ba40-e8754b076af6",
+            "edge_type": "CALLS_GITALY__gitlab",
+            "properties": {
+              "storage_names": [
+                "default"
+              ],
+              "tls": true
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-81f5-714b-aa48-160e8d18f079",
+            "entity_type": "edge",
+            "name": "c-webservice QUERIES_DATABASE__gitlab rds",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-794f-74de-85a3-4cc8a02f6457",
+            "edge_type": "QUERIES_DATABASE__gitlab",
+            "properties": {
+              "database": "main",
+              "role": "primary",
+              "tls_mode": "verify-full"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-822a-7259-ac59-b33585e00318",
+            "entity_type": "edge",
+            "name": "c-sidekiq QUERIES_DATABASE__gitlab rds",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-794f-74de-85a3-4cc8a02f6457",
+            "edge_type": "QUERIES_DATABASE__gitlab",
+            "properties": {
+              "database": "main",
+              "role": "primary",
+              "tls_mode": "verify-full"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-825d-73a5-b416-f25be9f6b8f2",
+            "entity_type": "edge",
+            "name": "c-toolbox QUERIES_DATABASE__gitlab rds",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7817-74f0-8385-cba9979fd0b5",
+            "to_entity_id": "01a0cc76-794f-74de-85a3-4cc8a02f6457",
+            "edge_type": "QUERIES_DATABASE__gitlab",
+            "properties": {
+              "database": "main",
+              "role": "primary",
+              "tls_mode": "verify-full"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-828f-7358-b8aa-42474ad35cc7",
+            "entity_type": "edge",
+            "name": "c-registry QUERIES_DATABASE__gitlab rds",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-77e0-7364-829b-ace8ccdbdf3d",
+            "to_entity_id": "01a0cc76-794f-74de-85a3-4cc8a02f6457",
+            "edge_type": "QUERIES_DATABASE__gitlab",
+            "properties": {
+              "database": "registry",
+              "role": "primary",
+              "tls_mode": "verify-full"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-82c4-7495-8571-81b02e9c45b0",
+            "entity_type": "edge",
+            "name": "c-webservice CALLS_REDIS__gitlab valkey",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-7980-7387-a9d4-3d511dc1bc5a",
+            "edge_type": "CALLS_REDIS__gitlab",
+            "properties": {
+              "redis_role": "all",
+              "tls": true
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-82fd-7110-adc0-4fbfc3b7cfa3",
+            "entity_type": "edge",
+            "name": "c-workhorse CALLS_REDIS__gitlab valkey",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7721-7097-a8ba-afae2d5113fc",
+            "to_entity_id": "01a0cc76-7980-7387-a9d4-3d511dc1bc5a",
+            "edge_type": "CALLS_REDIS__gitlab",
+            "properties": {
+              "redis_role": "all",
+              "tls": true
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8349-76b2-a354-38822d2e0536",
+            "entity_type": "edge",
+            "name": "c-sidekiq CALLS_REDIS__gitlab valkey",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-7980-7387-a9d4-3d511dc1bc5a",
+            "edge_type": "CALLS_REDIS__gitlab",
+            "properties": {
+              "redis_role": "all",
+              "tls": true
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8381-71c8-824e-6efae1bf99a8",
+            "entity_type": "edge",
+            "name": "c-webservice STORES_OBJECTS__gitlab b-artifacts",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-79b4-76b9-9e55-4d4ae43ff115",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "artifacts",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-83b7-75b0-a202-7c50c560d60f",
+            "entity_type": "edge",
+            "name": "c-webservice STORES_OBJECTS__gitlab b-lfs",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-79ea-7243-9c17-54fa34607502",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "lfs",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-840f-749a-ae53-ea9342c1b818",
+            "entity_type": "edge",
+            "name": "c-webservice STORES_OBJECTS__gitlab b-uploads",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-7a20-740f-907f-d71e663139ca",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "uploads",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-847e-75cb-9e29-173ff6e7b453",
+            "entity_type": "edge",
+            "name": "c-webservice STORES_OBJECTS__gitlab b-packages",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-7a57-77ca-822a-67572fb7fdbb",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "packages",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-84d8-714a-8d2b-b67e173cccbb",
+            "entity_type": "edge",
+            "name": "c-webservice STORES_OBJECTS__gitlab b-terraform_state",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-7a8f-71a6-8ffd-84134ca9eaef",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "terraform_state",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-850e-77d0-b6c0-cc2de02f8166",
+            "entity_type": "edge",
+            "name": "c-webservice STORES_OBJECTS__gitlab b-ci_secure_files",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-7ac5-701a-bc00-e3e5fc857760",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "ci_secure_files",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8547-77d1-b44f-f11447893a5c",
+            "entity_type": "edge",
+            "name": "c-webservice STORES_OBJECTS__gitlab b-dependency_proxy",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-7afe-71d0-832c-3dda7de8cb01",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "dependency_proxy",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8588-70d1-a68f-6eca72a1ee47",
+            "entity_type": "edge",
+            "name": "c-sidekiq STORES_OBJECTS__gitlab b-artifacts",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-79b4-76b9-9e55-4d4ae43ff115",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "artifacts",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-85c0-77bb-b9b0-63b24c3a2536",
+            "entity_type": "edge",
+            "name": "c-sidekiq STORES_OBJECTS__gitlab b-lfs",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-79ea-7243-9c17-54fa34607502",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "lfs",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-85fe-7143-9ebd-c2367892fc26",
+            "entity_type": "edge",
+            "name": "c-sidekiq STORES_OBJECTS__gitlab b-uploads",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-7a20-740f-907f-d71e663139ca",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "uploads",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8642-702c-abaa-622180e0a809",
+            "entity_type": "edge",
+            "name": "c-sidekiq STORES_OBJECTS__gitlab b-packages",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-7a57-77ca-822a-67572fb7fdbb",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "packages",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-867e-70cb-b8b8-2d6d63b04695",
+            "entity_type": "edge",
+            "name": "c-sidekiq STORES_OBJECTS__gitlab b-terraform_state",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-7a8f-71a6-8ffd-84134ca9eaef",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "terraform_state",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-86b5-769d-b599-fb256447bdff",
+            "entity_type": "edge",
+            "name": "c-sidekiq STORES_OBJECTS__gitlab b-ci_secure_files",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-7ac5-701a-bc00-e3e5fc857760",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "ci_secure_files",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-871d-73b6-842f-ead5383cbc9e",
+            "entity_type": "edge",
+            "name": "c-sidekiq STORES_OBJECTS__gitlab b-dependency_proxy",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-7afe-71d0-832c-3dda7de8cb01",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "dependency_proxy",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8774-7316-ae40-3fe4e41f47f1",
+            "entity_type": "edge",
+            "name": "c-registry STORES_OBJECTS__gitlab b-registry",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-77e0-7364-829b-ace8ccdbdf3d",
+            "to_entity_id": "01a0cc76-7b35-766d-9a51-3390ba5bb7cb",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "registry",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-87b9-758a-bf3b-1ce7f441864a",
+            "entity_type": "edge",
+            "name": "c-toolbox STORES_OBJECTS__gitlab b-backups",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7817-74f0-8385-cba9979fd0b5",
+            "to_entity_id": "01a0cc76-7b6c-7391-b164-e2f65da96148",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "backups",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-87fa-7371-b91a-e7cddf88578e",
+            "entity_type": "edge",
+            "name": "manager STORES_OBJECTS__gitlab b-runner_cache",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7882-70cc-ae68-807d3129ebcf",
+            "to_entity_id": "01a0cc76-7ba1-75b5-b4c3-4ffae178b2a3",
+            "edge_type": "STORES_OBJECTS__gitlab",
+            "properties": {
+              "object_type": "runner_cache",
+              "auth": "iam_role"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8835-74d3-882d-88f3687f7199",
+            "entity_type": "edge",
+            "name": "c-webservice READS_SECRET__gitlab sec-rails-secrets",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-7c0c-757b-9525-0d3e2fa1a232",
+            "edge_type": "READS_SECRET__gitlab",
+            "properties": {
+              "delivery": "env_var"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-886b-722a-a46d-ba7c15657918",
+            "entity_type": "edge",
+            "name": "c-webservice READS_SECRET__gitlab sec-db-password",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-7c43-77d0-b440-9636ac7ffdab",
+            "edge_type": "READS_SECRET__gitlab",
+            "properties": {
+              "delivery": "env_var"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-88a0-711d-aa30-c89f4e92eeb1",
+            "entity_type": "edge",
+            "name": "c-webservice READS_SECRET__gitlab sec-redis-auth",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-7c75-7035-be02-ba9ea4620c17",
+            "edge_type": "READS_SECRET__gitlab",
+            "properties": {
+              "delivery": "env_var"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-88d4-7566-8a33-765664916611",
+            "entity_type": "edge",
+            "name": "c-webservice READS_SECRET__gitlab sec-gitaly-token",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-76ec-7111-846c-0e2fe21abf31",
+            "to_entity_id": "01a0cc76-7ca9-76e6-add1-7b0187a49872",
+            "edge_type": "READS_SECRET__gitlab",
+            "properties": {
+              "delivery": "env_var"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-890a-753a-9485-221c9028e5b3",
+            "entity_type": "edge",
+            "name": "c-sidekiq READS_SECRET__gitlab sec-rails-secrets",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-7c0c-757b-9525-0d3e2fa1a232",
+            "edge_type": "READS_SECRET__gitlab",
+            "properties": {
+              "delivery": "env_var"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8940-776a-b7de-02fd120780fa",
+            "entity_type": "edge",
+            "name": "c-sidekiq READS_SECRET__gitlab sec-db-password",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-7c43-77d0-b440-9636ac7ffdab",
+            "edge_type": "READS_SECRET__gitlab",
+            "properties": {
+              "delivery": "env_var"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8976-7248-bc9e-8ba22bfbccb8",
+            "entity_type": "edge",
+            "name": "c-sidekiq READS_SECRET__gitlab sec-redis-auth",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-7c75-7035-be02-ba9ea4620c17",
+            "edge_type": "READS_SECRET__gitlab",
+            "properties": {
+              "delivery": "env_var"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-89b0-743a-86c6-3f3392fc318d",
+            "entity_type": "edge",
+            "name": "c-sidekiq READS_SECRET__gitlab sec-gitaly-token",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-776f-747a-a945-059ac8fd3917",
+            "to_entity_id": "01a0cc76-7ca9-76e6-add1-7b0187a49872",
+            "edge_type": "READS_SECRET__gitlab",
+            "properties": {
+              "delivery": "env_var"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-89ea-730c-ad35-07c0f2e0d208",
+            "entity_type": "edge",
+            "name": "c-toolbox READS_SECRET__gitlab sec-rails-secrets",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7817-74f0-8385-cba9979fd0b5",
+            "to_entity_id": "01a0cc76-7c0c-757b-9525-0d3e2fa1a232",
+            "edge_type": "READS_SECRET__gitlab",
+            "properties": {
+              "delivery": "env_var"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8a2b-76fe-a51f-db142a77dc57",
+            "entity_type": "edge",
+            "name": "c-toolbox READS_SECRET__gitlab sec-db-password",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7817-74f0-8385-cba9979fd0b5",
+            "to_entity_id": "01a0cc76-7c43-77d0-b440-9636ac7ffdab",
+            "edge_type": "READS_SECRET__gitlab",
+            "properties": {
+              "delivery": "env_var"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8a75-76cd-a586-f363bda55de4",
+            "entity_type": "edge",
+            "name": "gitaly READS_SECRET__gitlab sec-gitaly-token",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-784d-7409-ba40-e8754b076af6",
+            "to_entity_id": "01a0cc76-7ca9-76e6-add1-7b0187a49872",
+            "edge_type": "READS_SECRET__gitlab",
+            "properties": {
+              "delivery": "env_var"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8ab5-71ec-b5fc-dfdcde5d801a",
+            "entity_type": "edge",
+            "name": "manager READS_SECRET__gitlab sec-runner-token",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7882-70cc-ae68-807d3129ebcf",
+            "to_entity_id": "01a0cc76-7cdb-71fd-8f3e-87bb106a2877",
+            "edge_type": "READS_SECRET__gitlab",
+            "properties": {
+              "delivery": "env_var"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8af3-7429-a77e-b2f5fe117eaa",
+            "entity_type": "edge",
+            "name": "b-artifacts ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-79b4-76b9-9e55-4d4ae43ff115",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8b30-7465-9621-690d6cb24244",
+            "entity_type": "edge",
+            "name": "b-lfs ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-79ea-7243-9c17-54fa34607502",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8b70-77c1-b900-222265ba1a2d",
+            "entity_type": "edge",
+            "name": "b-uploads ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7a20-740f-907f-d71e663139ca",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8baf-719b-bf78-1232415f6d6f",
+            "entity_type": "edge",
+            "name": "b-packages ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7a57-77ca-822a-67572fb7fdbb",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8bed-7021-8f3f-63b9d1492714",
+            "entity_type": "edge",
+            "name": "b-terraform_state ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7a8f-71a6-8ffd-84134ca9eaef",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8c2f-7394-af32-5de30d31442c",
+            "entity_type": "edge",
+            "name": "b-ci_secure_files ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7ac5-701a-bc00-e3e5fc857760",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8c79-7278-8030-500423322f2e",
+            "entity_type": "edge",
+            "name": "b-dependency_proxy ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7afe-71d0-832c-3dda7de8cb01",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8cbf-718f-9b85-81933e46adac",
+            "entity_type": "edge",
+            "name": "b-registry ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7b35-766d-9a51-3390ba5bb7cb",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8d19-7217-bce6-8f85324b44db",
+            "entity_type": "edge",
+            "name": "b-backups ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7b6c-7391-b164-e2f65da96148",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8d59-7431-a6cb-c32d1f14c580",
+            "entity_type": "edge",
+            "name": "b-runner_cache ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7ba1-75b5-b4c3-4ffae178b2a3",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8d99-7098-966a-f68722c58d6d",
+            "entity_type": "edge",
+            "name": "sec-rails-secrets ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7c0c-757b-9525-0d3e2fa1a232",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8dd5-7253-b885-bbb1b952ea5d",
+            "entity_type": "edge",
+            "name": "sec-db-password ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7c43-77d0-b440-9636ac7ffdab",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8e12-73cc-8f9d-be4bfd3388ed",
+            "entity_type": "edge",
+            "name": "sec-redis-auth ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7c75-7035-be02-ba9ea4620c17",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8e54-77cc-81df-30456a14575b",
+            "entity_type": "edge",
+            "name": "sec-gitaly-token ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7ca9-76e6-add1-7b0187a49872",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8e93-7567-984a-339010a2a3fb",
+            "entity_type": "edge",
+            "name": "sec-runner-token ENCRYPTED_WITH_KEY__aws_core kms",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7cdb-71fd-8f3e-87bb106a2877",
+            "to_entity_id": "01a0cc76-7bd8-7611-b581-f2eb393ff985",
+            "edge_type": "ENCRYPTED_WITH_KEY__aws_core",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8ed1-7250-9031-c2ff513a31ec",
+            "entity_type": "edge",
+            "name": "manager AUTHENTICATES_AS_RUNNER__gitlab runner",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7882-70cc-ae68-807d3129ebcf",
+            "to_entity_id": "01a0cc76-78b6-7382-8f51-e626dae1eb1b",
+            "edge_type": "AUTHENTICATES_AS_RUNNER__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8f0d-7509-9d22-a7c0363ff20f",
+            "entity_type": "edge",
+            "name": "manager LAUNCHES_JOB_TASKS__gitlab jobs-cluster",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7882-70cc-ae68-807d3129ebcf",
+            "to_entity_id": "01a0cc76-7530-7669-a0c7-33e65745acc8",
+            "edge_type": "LAUNCHES_JOB_TASKS__gitlab",
+            "properties": {
+              "platform": "ecs_fargate"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8f4a-7689-9e5b-97e7b3b729c9",
+            "entity_type": "edge",
+            "name": "instance REGISTERS_RUNNER__gitlab runner",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-74bd-711e-8851-5dba73c3f330",
+            "to_entity_id": "01a0cc76-78b6-7382-8f51-e626dae1eb1b",
+            "edge_type": "REGISTERS_RUNNER__gitlab",
+            "properties": {
+              "assignment": "owner"
+            }
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8f8c-75be-8d1b-3d6e633c4856",
+            "entity_type": "edge",
+            "name": "instance AUTHENTICATES_VIA_PROVIDER__gitlab sso",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-74bd-711e-8851-5dba73c3f330",
+            "to_entity_id": "01a0cc76-7d10-71a7-a2aa-9cf225a453cc",
+            "edge_type": "AUTHENTICATES_VIA_PROVIDER__gitlab",
+            "properties": {}
+          }
+        },
+        {
+          "entity": {
+            "entity_id": "01a0cc76-8fcd-771b-8939-7a3149920190",
+            "entity_type": "edge",
+            "name": "sso TRUSTS_ISSUER__identity_core issuer",
+            "dimensions": {}
+          },
+          "edge": {
+            "from_entity_id": "01a0cc76-7d10-71a7-a2aa-9cf225a453cc",
+            "to_entity_id": "01a0cc76-7d43-703a-b202-c17185743b50",
+            "edge_type": "TRUSTS_ISSUER__identity_core",
+            "properties": {}
+          }
+        }
+      ]
+    }
+  ]
+}
