@@ -115,3 +115,20 @@ def test_a_value_cannot_be_smuggled_in() -> None:
     assert not _create("gitlab__ci_variable", {"instance_name": "gl", "scope": "instance", "key": "K", "configuration": {"value": "sentinel"}}).success
     assert not _create("gitlab__ci_variable", {"instance_name": "gl", "scope": "instance", "key": "K", "value": "sentinel"}).success
     assert not _create("gitlab__runner_manager", {"instance_name": "gl", "name": "m", "configuration": {"token": "sentinel"}}).success
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("url", "accepted"),
+    [
+        ("https://siem.example/collector", True),
+        ("", True),
+        ("https://user:pass@siem.example/hook", False),
+        ("https://siem.example/hook?token=sentinel", False),
+        ("https://siem.example/hook#token=sentinel", False),
+    ],
+)
+def test_destination_url_carries_no_credential(url: str, accepted: bool) -> None:
+    """An audit destination's URL keeps scheme, host and path only: user info, a query or a fragment could carry a token."""
+    result = _create("gitlab__audit_event_destination", {"instance_name": "gl", "name": "siem", "destination_url": url})
+    assert result.success is accepted

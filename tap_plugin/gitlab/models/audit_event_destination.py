@@ -36,7 +36,7 @@ class AuditEventDestination(BaseModel):
         "name": {"type": "string", "minLength": 1},
         "destination_type": {"type": "string", "enum": ["http", "aws_s3", "google_cloud_logging", ""]},
         "scope": {"type": "string", "enum": ["instance", "group", ""]},
-        "destination_url": {"type": "string"},
+        "destination_url": {"type": "string", "pattern": "^(https?://[^/@?#\\s]+(/[^?#@\\s]*)?)?$"},
         "active": {"type": ["boolean", "null"]},
         "event_type_filters": {"type": ["array", "null"], "items": {"type": "string"}},
     }
@@ -52,7 +52,8 @@ class AuditEventDestination(BaseModel):
     destination_type = models.CharField(max_length=32, blank=True, default="")
     # Whether the instance or a top-level group streams to it.
     scope = models.CharField(max_length=16, blank=True, default="")
-    # For an HTTP destination, the endpoint URL.
+    # For an HTTP destination, the endpoint as scheme, host and path only: no user info, query or fragment,
+    # where a credential could ride.
     destination_url = models.CharField(max_length=1024, blank=True, default="")
     # Whether streaming to the destination is active.
     active = models.BooleanField(null=True, blank=True)
