@@ -1,0 +1,15 @@
+{
+  "slug": "STREAMS_AUDIT_EVENTS__gitlab",
+  "name": "Streams Audit Events",
+  "description": "An instance or a top-level group streams its audit events to this destination.",
+  "sources": [
+    "gitlab__gitlab_instance",
+    "gitlab__gitlab_group"
+  ],
+  "targets": [
+    "gitlab__audit_event_destination"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

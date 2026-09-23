@@ -1,0 +1,14 @@
+{
+  "slug": "NESTS_SUBGROUP__gitlab",
+  "name": "Nests Subgroup",
+  "description": "A group holds this subgroup; members of the parent inherit access to it.",
+  "sources": [
+    "gitlab__gitlab_group"
+  ],
+  "targets": [
+    "gitlab__gitlab_group"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

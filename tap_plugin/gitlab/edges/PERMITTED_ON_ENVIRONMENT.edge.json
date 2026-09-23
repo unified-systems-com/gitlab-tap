@@ -1,0 +1,37 @@
+{
+  "slug": "PERMITTED_ON_ENVIRONMENT__gitlab",
+  "name": "Permitted On Environment",
+  "description": "A specific user or group is named in a protected environment as allowed to deploy or to approve deployments.",
+  "sources": [
+    "gitlab__gitlab_user",
+    "gitlab__gitlab_group"
+  ],
+  "targets": [
+    "gitlab__gitlab_environment"
+  ],
+  "property_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "deploy",
+          "approve"
+        ],
+        "description": "What the grant allows."
+      },
+      "required_approvals": {
+        "type": "integer",
+        "minimum": 0,
+        "description": "For an approval rule, how many approvals this rule contributes."
+      }
+    },
+    "required": [
+      "action"
+    ]
+  },
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "slug": "DECLARES_ENVIRONMENT__gitlab",
+  "name": "Declares Environment",
+  "description": "A project declares this deployment environment.",
+  "sources": [
+    "gitlab__gitlab_project"
+  ],
+  "targets": [
+    "gitlab__gitlab_environment"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

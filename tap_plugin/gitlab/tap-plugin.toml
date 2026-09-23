@@ -1,9 +1,17 @@
 manifest_version = "0"
-plugin_version = "0.1.0"
+plugin_version = "0.2.0"
 requires_tap = ">=0.2.1"
 slug = "gitlab"
 name = "TAP GitLab"
-description = "GitLab as grid vocabulary: v0 carries one outer node, the GitLab instance (a self-managed server or gitlab.com), so a design can place it before anything is collected."
+description = "GitLab as grid vocabulary: a small self-managed GitLab as deployed (its components, Gitaly, runners and what they run on and store to) and the objects a FedRAMP operator governs in it (groups, projects, users, runners, protected branches and environments, CI/CD variables, keys and tokens, sign-in providers, audit streams), with a /gitlab page per instance."
+
+# Vocabulary dependencies (Tier 1b): no Python imports. identity_core owns the OIDC issuer an SSO provider
+# trusts (TRUSTS_ISSUER__identity_core); aws_core owns the load-balancer edge the /gitlab page's ingress
+# scene search names (ROUTES_TRAFFIC__aws_core). This plugin's own edges leave the AWS side open.
+depends_on = [
+    { slug = "identity_core", note = "Vocabulary dependency: an OIDC sign-in provider trusts an identity_core__oidc_issuer through identity_core's TRUSTS_ISSUER edge (req-gitlab-edges-application)." },
+    { slug = "aws_core", note = "Vocabulary dependency: the /gitlab page's ingress search names ROUTES_TRAFFIC__aws_core (a load balancer routing to a GitLab component), and the page draws aws_core nodes that GitLab processes run on and store to (req-gitlab-page)." },
+]
 
 # Pure Python, no dependencies, no crypto (spec-fips.md, req-tap-plugin-manifest-v0-fips).
 [fips]
@@ -11,10 +19,64 @@ status = "compatible"
 
 [models]
 gitlab__gitlab_instance = "tap_plugin.gitlab.models.gitlab_instance.GitlabInstance"
+gitlab__gitlab_component = "tap_plugin.gitlab.models.gitlab_component.GitlabComponent"
+gitlab__gitaly_node = "tap_plugin.gitlab.models.gitaly_node.GitalyNode"
+gitlab__runner_manager = "tap_plugin.gitlab.models.runner_manager.RunnerManager"
+gitlab__gitlab_runner = "tap_plugin.gitlab.models.gitlab_runner.GitlabRunner"
+gitlab__gitlab_group = "tap_plugin.gitlab.models.gitlab_group.GitlabGroup"
+gitlab__gitlab_project = "tap_plugin.gitlab.models.gitlab_project.GitlabProject"
+gitlab__gitlab_user = "tap_plugin.gitlab.models.gitlab_user.GitlabUser"
+gitlab__protected_branch = "tap_plugin.gitlab.models.protected_branch.ProtectedBranch"
+gitlab__gitlab_environment = "tap_plugin.gitlab.models.gitlab_environment.GitlabEnvironment"
+gitlab__ci_variable = "tap_plugin.gitlab.models.ci_variable.CiVariable"
+gitlab__deploy_key = "tap_plugin.gitlab.models.deploy_key.DeployKey"
+gitlab__deploy_token = "tap_plugin.gitlab.models.deploy_token.DeployToken"
+gitlab__access_token = "tap_plugin.gitlab.models.access_token.AccessToken"
+gitlab__sso_provider = "tap_plugin.gitlab.models.sso_provider.SsoProvider"
+gitlab__audit_event_destination = "tap_plugin.gitlab.models.audit_event_destination.AuditEventDestination"
+
+[edges]
+RUNS_COMPONENT__gitlab = "edges/RUNS_COMPONENT.edge.json"
+RUNS_ON_SERVICE__gitlab = "edges/RUNS_ON_SERVICE.edge.json"
+CALLS_GITALY__gitlab = "edges/CALLS_GITALY.edge.json"
+QUERIES_DATABASE__gitlab = "edges/QUERIES_DATABASE.edge.json"
+CALLS_REDIS__gitlab = "edges/CALLS_REDIS.edge.json"
+STORES_OBJECTS__gitlab = "edges/STORES_OBJECTS.edge.json"
+STORES_REPOSITORIES_ON_VOLUME__gitlab = "edges/STORES_REPOSITORIES_ON_VOLUME.edge.json"
+READS_SECRET__gitlab = "edges/READS_SECRET.edge.json"
+AUTHENTICATES_AS_RUNNER__gitlab = "edges/AUTHENTICATES_AS_RUNNER.edge.json"
+LAUNCHES_JOB_TASKS__gitlab = "edges/LAUNCHES_JOB_TASKS.edge.json"
+HOSTS_GROUP__gitlab = "edges/HOSTS_GROUP.edge.json"
+NESTS_SUBGROUP__gitlab = "edges/NESTS_SUBGROUP.edge.json"
+HOLDS_PROJECT__gitlab = "edges/HOLDS_PROJECT.edge.json"
+HOLDS_ACCOUNT__gitlab = "edges/HOLDS_ACCOUNT.edge.json"
+MEMBER_OF_GROUP__gitlab = "edges/MEMBER_OF_GROUP.edge.json"
+MEMBER_OF_PROJECT__gitlab = "edges/MEMBER_OF_PROJECT.edge.json"
+INVITES_GROUP__gitlab = "edges/INVITES_GROUP.edge.json"
+REGISTERS_RUNNER__gitlab = "edges/REGISTERS_RUNNER.edge.json"
+DECLARES_PROTECTED_BRANCH__gitlab = "edges/DECLARES_PROTECTED_BRANCH.edge.json"
+PERMITTED_ON_BRANCH__gitlab = "edges/PERMITTED_ON_BRANCH.edge.json"
+DECLARES_ENVIRONMENT__gitlab = "edges/DECLARES_ENVIRONMENT.edge.json"
+PERMITTED_ON_ENVIRONMENT__gitlab = "edges/PERMITTED_ON_ENVIRONMENT.edge.json"
+DEFINES_VARIABLE__gitlab = "edges/DEFINES_VARIABLE.edge.json"
+ENABLES_DEPLOY_KEY__gitlab = "edges/ENABLES_DEPLOY_KEY.edge.json"
+ISSUES_DEPLOY_TOKEN__gitlab = "edges/ISSUES_DEPLOY_TOKEN.edge.json"
+ISSUES_ACCESS_TOKEN__gitlab = "edges/ISSUES_ACCESS_TOKEN.edge.json"
+AUTHENTICATES_AS_USER__gitlab = "edges/AUTHENTICATES_AS_USER.edge.json"
+AUTHENTICATES_VIA_PROVIDER__gitlab = "edges/AUTHENTICATES_VIA_PROVIDER.edge.json"
+SIGNS_IN_VIA_PROVIDER__gitlab = "edges/SIGNS_IN_VIA_PROVIDER.edge.json"
+TRUSTS_SAML_IDP__gitlab = "edges/TRUSTS_SAML_IDP.edge.json"
+STREAMS_AUDIT_EVENTS__gitlab = "edges/STREAMS_AUDIT_EVENTS.edge.json"
+DELIVERS_EVENTS__gitlab = "edges/DELIVERS_EVENTS.edge.json"
+RESIDES_ON_GITALY__gitlab = "edges/RESIDES_ON_GITALY.edge.json"
+ALLOWLISTS_JOB_TOKEN__gitlab = "edges/ALLOWLISTS_JOB_TOKEN.edge.json"
+
+[grift]
+gitlab_page = "grift/gitlab-page.grift.json"
 
 # In-package boot record (req-boot-bootstrap-records-in-package). Digest is the canonical sha256
 # of the record; regenerate with scripts/boot-record-hash --refresh in a core checkout.
 [[boot.records]]
 name = "ci"
-description = "RESERVED NAME (req-boot-bootstrap-ci-record): the stack this plugin's own tests run in — depends_on closure (empty) + self, offline, credential-free. The consumer flips self to editable."
-sha256 = "b5b7172d0f8ec006cdaeefa8e2c0312f8537fca82cae7b6b322b2314f7122fd5"
+description = "RESERVED NAME (req-boot-bootstrap-ci-record): the stack this plugin's own tests run in — depends_on closure (identity_core, aws_core, pinned) + self, credential-free, network only to install the pins. The consumer flips self to editable."
+sha256 = "6f2161b88f91a91b8715f7aac3e9b56e06efbf93e1c1414dd1fecb60cd2aafe0"

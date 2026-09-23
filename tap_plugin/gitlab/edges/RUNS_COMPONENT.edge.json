@@ -1,0 +1,15 @@
+{
+  "slug": "RUNS_COMPONENT__gitlab",
+  "name": "Runs Component",
+  "description": "A GitLab instance runs this component or Gitaly node as part of its deployment. The instance is the whole; the edge names each process that makes it up.",
+  "sources": [
+    "gitlab__gitlab_instance"
+  ],
+  "targets": [
+    "gitlab__gitlab_component",
+    "gitlab__gitaly_node"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "infrastructure"
+  }
+}

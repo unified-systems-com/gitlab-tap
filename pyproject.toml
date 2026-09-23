@@ -3,7 +3,7 @@
 #   entry-point key = "gitlab"
 [project]
 name = "gitlab-tap"
-description = "GitLab as grid vocabulary: v0 carries one outer node, the GitLab instance (a self-managed server or gitlab.com), so a design can place it before anything is collected."
+description = "GitLab as grid vocabulary: a small self-managed GitLab as deployed (its components, Gitaly, runners and what they run on and store to) and the objects a FedRAMP operator governs in it (groups, projects, users, runners, protected branches and environments, CI/CD variables, keys and tokens, sign-in providers, audit streams), with a /gitlab page per instance."
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.14"

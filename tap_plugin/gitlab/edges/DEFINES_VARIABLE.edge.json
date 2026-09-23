@@ -1,0 +1,16 @@
+{
+  "slug": "DEFINES_VARIABLE__gitlab",
+  "name": "Defines Variable",
+  "description": "An instance, group or project defines this CI/CD variable; its jobs (and, for a group, its descendants' jobs) receive it subject to the variable's protections.",
+  "sources": [
+    "gitlab__gitlab_instance",
+    "gitlab__gitlab_group",
+    "gitlab__gitlab_project"
+  ],
+  "targets": [
+    "gitlab__ci_variable"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "slug": "STORES_REPOSITORIES_ON_VOLUME__gitlab",
+  "name": "Stores Repositories On Volume",
+  "description": "A Gitaly node keeps its repositories on this volume. The target is open: an attached EBS volume (aws_core__aws_ebs_volume) here. GitLab supports only local block storage for Gitaly; the filesystem property makes an unsupported NFS or EFS mount visible.",
+  "sources": [
+    "gitlab__gitaly_node"
+  ],
+  "property_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "storage_name": {
+        "type": "string",
+        "description": "The repository storage served from this volume."
+      },
+      "mount_path": {
+        "type": "string",
+        "description": "Where the volume is mounted in the Gitaly container."
+      },
+      "filesystem": {
+        "type": "string",
+        "enum": [
+          "ext4",
+          "xfs",
+          "nfs",
+          "efs",
+          "other"
+        ],
+        "description": "The filesystem the repositories sit on. nfs and efs are unsupported by GitLab."
+      }
+    }
+  },
+  "default_dimensions": {
+    "gitlab.plane": "infrastructure"
+  }
+}

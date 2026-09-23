@@ -1,0 +1,15 @@
+{
+  "slug": "DECLARES_PROTECTED_BRANCH__gitlab",
+  "name": "Declares Protected Branch",
+  "description": "A project (or, on Premium, a group) declares this protected-branch rule.",
+  "sources": [
+    "gitlab__gitlab_project",
+    "gitlab__gitlab_group"
+  ],
+  "targets": [
+    "gitlab__protected_branch"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

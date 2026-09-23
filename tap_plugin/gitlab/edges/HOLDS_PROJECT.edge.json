@@ -1,0 +1,15 @@
+{
+  "slug": "HOLDS_PROJECT__gitlab",
+  "name": "Holds Project",
+  "description": "A namespace (a group, or a user's personal namespace) holds this project.",
+  "sources": [
+    "gitlab__gitlab_group",
+    "gitlab__gitlab_user"
+  ],
+  "targets": [
+    "gitlab__gitlab_project"
+  ],
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

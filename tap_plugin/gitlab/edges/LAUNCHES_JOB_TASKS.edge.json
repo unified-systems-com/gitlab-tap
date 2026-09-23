@@ -1,0 +1,32 @@
+{
+  "slug": "LAUNCHES_JOB_TASKS__gitlab",
+  "name": "Launches Job Tasks",
+  "description": "A runner manager launches each CI/CD job as a workload on this platform. The target is open: an ECS cluster (aws_core__aws_ecs_cluster) running Fargate tasks here, an EC2 autoscaling group or a Kubernetes namespace elsewhere.",
+  "sources": [
+    "gitlab__runner_manager"
+  ],
+  "property_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "platform": {
+        "type": "string",
+        "enum": [
+          "ecs_fargate",
+          "ecs_ec2",
+          "ec2_autoscaling_group",
+          "docker_host",
+          "kubernetes",
+          "other"
+        ],
+        "description": "Where the job workloads run."
+      }
+    },
+    "required": [
+      "platform"
+    ]
+  },
+  "default_dimensions": {
+    "gitlab.plane": "infrastructure"
+  }
+}

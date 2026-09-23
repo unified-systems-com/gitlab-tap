@@ -1,0 +1,31 @@
+{
+  "slug": "CALLS_GITALY__gitlab",
+  "name": "Calls Gitaly",
+  "description": "A component makes Git RPC calls to a Gitaly node (webservice, Sidekiq and GitLab Shell all do). The TLS property matters for FIPS: the communication between components must be compliant too.",
+  "sources": [
+    "gitlab__gitlab_component"
+  ],
+  "targets": [
+    "gitlab__gitaly_node"
+  ],
+  "property_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "storage_names": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "The repository storages the caller reaches on this node."
+      },
+      "tls": {
+        "type": "boolean",
+        "description": "Whether the connection uses TLS (port 9999) rather than plaintext (8075)."
+      }
+    }
+  },
+  "default_dimensions": {
+    "gitlab.plane": "infrastructure"
+  }
+}

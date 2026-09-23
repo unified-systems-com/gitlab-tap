@@ -1,0 +1,24 @@
+{
+  "slug": "RESIDES_ON_GITALY__gitlab",
+  "name": "Resides On Gitaly",
+  "description": "A project's repository is stored on this Gitaly node. The blast radius of a Gitaly volume is the set of projects on it.",
+  "sources": [
+    "gitlab__gitlab_project"
+  ],
+  "targets": [
+    "gitlab__gitaly_node"
+  ],
+  "property_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "storage_name": {
+        "type": "string",
+        "description": "The repository storage the project is assigned to."
+      }
+    }
+  },
+  "default_dimensions": {
+    "gitlab.plane": "application"
+  }
+}

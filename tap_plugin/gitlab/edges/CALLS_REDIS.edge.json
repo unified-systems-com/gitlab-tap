@@ -1,0 +1,39 @@
+{
+  "slug": "CALLS_REDIS__gitlab",
+  "name": "Calls Redis",
+  "description": "A component connects to a Redis (or Valkey) instance. The target is open: an ElastiCache cluster (aws_core__aws_elasticache_cluster) here. GitLab needs standalone (primary with replica) mode, not Redis Cluster.",
+  "sources": [
+    "gitlab__gitlab_component"
+  ],
+  "property_schema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "redis_role": {
+        "type": "string",
+        "enum": [
+          "all",
+          "cache",
+          "queues",
+          "shared_state",
+          "sessions",
+          "trace_chunks",
+          "rate_limiting",
+          "repository_cache",
+          "workhorse"
+        ],
+        "description": "Which of GitLab's Redis roles this connection serves (all when one Redis serves every role)."
+      },
+      "tls": {
+        "type": "boolean",
+        "description": "Whether the connection uses TLS (rediss://)."
+      }
+    },
+    "required": [
+      "redis_role"
+    ]
+  },
+  "default_dimensions": {
+    "gitlab.plane": "infrastructure"
+  }
+}
