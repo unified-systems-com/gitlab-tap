@@ -79,4 +79,4 @@ gitlab_page = "grift/gitlab-page.grift.json"
 [[boot.records]]
 name = "ci"
 description = "RESERVED NAME (req-boot-bootstrap-ci-record): the stack this plugin's own tests run in — depends_on closure (empty) + self, offline, credential-free. The consumer flips self to editable."
-sha256 = "4cf7992993d33ce2178e6f2e8c2dc4bb3632e8588b2aebdf9c6a835115176f6f"
+sha256 = "52f6bc0de1a64ddaf44fa0f691dea555d08ff0b46682d99bd4b151cfc0f8cd2b"

@@ -9,9 +9,9 @@
         "source": {
           "type": "git",
           "url": "https://github.com/unified-systems-com/tap-plugin-identity-core",
-          "rev": "main"
+          "rev": "fb80f4150a288007e511b4adf34e244dafe8608b"
         },
-        "note": "Vocabulary dependency: owns identity_core__oidc_issuer and TRUSTS_ISSUER, which an OIDC sign-in provider points at. Rides main until it has a tagged release (starter record pinned by rev only)."
+        "note": "Vocabulary dependency: owns identity_core__oidc_issuer and TRUSTS_ISSUER, which an OIDC sign-in provider points at. Pinned to the full commit of its main on 2026-09-22 until it has a tagged release; move the pin deliberately."
       },
       {
         "slug": "aws_core",
@@ -19,9 +19,9 @@
         "source": {
           "type": "git",
           "url": "https://github.com/unified-systems-com/tap-plugin-aws-core",
-          "rev": "main"
+          "rev": "4e624769263f4e64bcce2c98643dc5d041639619"
         },
-        "note": "Vocabulary dependency: owns ROUTES_TRAFFIC, which the /gitlab page's ingress search names, and the AWS types the page draws. Rides main until it has a tagged release (starter record pinned by rev only)."
+        "note": "Vocabulary dependency: owns ROUTES_TRAFFIC, which the /gitlab page's ingress search names, and the AWS types the page draws. Pinned to the full commit of its main on 2026-09-22 until it has a tagged release; move the pin deliberately."
       },
       {
         "slug": "gitlab",

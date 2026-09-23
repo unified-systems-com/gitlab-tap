@@ -105,18 +105,25 @@ def test_posture_tiles_three_states(grid: None) -> None:
     from tap_grid.services import WriteOperation, write_batch
 
     write_batch([WriteOperation(verb="create_node", type_slug="gitlab__access_token",
-                                payload={"instance_name": "GitLab", "owner_path": "alice", "name": "cli", "expires": False})],
+                                payload={"instance_name": "GitLab", "owner_path": "alice", "name": "cli", "expires": False}),
+                 # A variable whose protection nobody observed: it must not make the variables tile read clear.
+                 WriteOperation(verb="create_node", type_slug="gitlab__ci_variable",
+                                payload={"instance_name": "GitLab", "scope": "instance", "key": "DEPLOY_TOKEN"})],
                 caller_context=CallerContext())
     posture = next(n for n in _nodes(PAGE, "panel") if n["node"]["slug"] == "gitlab-posture")
     tiles = {t["key"]: t for t in posture["node"]["config"]["tiles"]}
     inputs = {"instance": "GitLab", "cutoff": "2100-01-01T00:00:00Z"}
     state = {key: answer(spec, inputs) for key, spec in tiles.items()}
     assert all(t.state != "error" for t in state.values()), {k: t.error for k, t in state.items() if t.state == "error"}
-    assert state["variables"].state == "not_observed"
-    assert state["open-runners"].state == "clear" and state["open-runners"].population == 1
-    assert state["privileged"].state == "clear"
+    # Unobserved deciding facts never read clear: they are counted apart and the tile reads not observed.
+    assert (state["variables"].state, state["variables"].unobserved) == ("not_observed", 1)
+    assert (state["components"].state, state["components"].unobserved) == ("not_observed", 6)
+    assert (state["open-runners"].state, state["open-runners"].unobserved) == ("not_observed", 1)  # access_level unset
+    assert state["gitaly-storage"].state == "not_observed"  # the fixture has no volume edge
+    # Observed facts answer.
+    assert state["privileged"].state == "clear" and state["privileged"].population == 1
     assert state["password-signin"].state == "clear"
     assert state["audit-stream"].state == "finding"  # CE: no audit event streaming
     # A token whose revoked flag was never observed still counts: a null is not "revoked".
     assert state["tokens-never-expire"].state == "finding" and state["tokens-never-expire"].count == 1
-    assert state["components"].secondary_count == 6  # health never observed on any component
+

@@ -385,8 +385,12 @@ Status: `Implemented`
 
 A panel type that names the instance the page shows (with links to each when there are several) and then one
 tile per posture question, each tile declared in the panel instance's config: a population query, a finding
-query, an optional secondary query, and a tone. A tile whose population is empty reads *not observed*; a
-failed query reads *could not read*; only a populated, answered tile shows a count.
+query, an optional unobserved query, an optional secondary query, and a tone. The population is only the
+objects whose deciding fact was **observed** (a variable whose `protected` is not null, a Gitaly node whose
+volume's `filesystem` is recorded), so an object nobody looked at can never make a tile read clear; the
+unobserved query counts the rest and the tile says how many. A tile whose population is empty reads *not
+observed*; a failed query reads *could not read* (the detail goes to the server log, not the page); only a
+populated, answered tile shows a count.
 
 #### Implementation
 
@@ -394,13 +398,17 @@ failed query reads *could not read*; only a populated, answered tile shows a cou
 css `gitlab/css/posture.css`), registered in `GitlabConfig.ready()`. Reads through
 `execute_gryphon_raw(..., layer="full")`; counts are envelope node counts. Inputs supplied to a query only
 if it names them: `instance` (the page's `?instance=`) and `cutoff` (now + 30 days, ISO 8601). Tile config:
-`{key, label, help, population, finding, secondary?: {label, query}, tone: bad_if_any | good_if_any}`.
+`{key, label, help, population, finding, unobserved?, secondary?: {label, query}, tone: bad_if_any |
+good_if_any}`. When the selected name is both the start and the end of another instance's name, the strip
+says the page cannot tell them apart (see `req-gitlab-page`).
 
 #### Acceptance Criteria
 
 | ACID | Title | Status | Description | Notes |
 | --- | --- | :---: | --- | --- |
 | req-gitlab-panel-posture-1 | Three States | Implemented | A type absent for the instance reads not observed; a populated tile counts; an error reads could not read. | `tests/test_gitlab_page.py` |
+| req-gitlab-panel-posture-4 | Unobserved Never Clear | Implemented | An object whose deciding fact is null is outside the population and counted as unobserved; a tile holding only such objects reads not observed. | A CI variable with `protected` null; the fixture's Gitaly with no volume edge. |
+| req-gitlab-panel-posture-5 | Overlapping Names Said | Implemented | Selecting a name that another instance's name begins and ends with puts a note on the strip. | `tests/test_gitlab_posture.py` |
 | req-gitlab-panel-posture-2 | Null Is Not Revoked | Implemented | A token whose `revoked` was never observed still counts as live. | |
 | req-gitlab-panel-posture-3 | Every Tile Answers | Implemented | Every tile the page configures runs without error against the example deployment. | |
 
@@ -420,7 +428,7 @@ key); blank selects every instance, which is the single instance when there is o
 
 #### Implementation
 
-`grift/gitlab-page.grift.json` (`[grift] gitlab_page`), batch `gitlab page v0.1.0`: the page, the graph
+`grift/gitlab-page.grift.json` (`[grift] gitlab_page`), batch `gitlab page v0.1.1`: the page, the graph
 panel (`tap_viz/panels/graph_panel.html`) with its projection (`node_style: icon-badge`, `lock_nodes`,
 `min_zoom: fit`), elevation and layout, 23 scene searches each naming its edge type (one per edge type and
 labelled GitLab source type, because Gryphon filters a field only on a labelled variable), the posture panel
@@ -428,8 +436,10 @@ with 13 tiles, and 14 standard table panels (`tap_web/panels/table_panel.html`) 
 search. Every search declares `instance` with `default: ""` (`req-grid-search-obj-5-2`) and filters with
 `instance_name STARTS_WITH $instance AND instance_name ENDS_WITH $instance` — Gryphon has no
 param-absent predicate yet (tap#360), and a string operator on `entity_id` is refused, so the page keys on
-the instance's name rather than its entity id. The filter is exact unless one instance's name both begins and
-ends with another's. The graph's scene includes aws_core's `ROUTES_TRAFFIC` into a component, which is why
+the instance's name rather than its entity id. The filter is **not** exact when one instance's name both begins and
+ends with another's (`aba` also selects `ababa`); the posture strip says so when it happens, and the tables
+cannot. Name instances so that none begins and ends with another (`staging`, `production`) until tap#360
+lands, then switch every search to equality. The graph's scene includes aws_core's `ROUTES_TRAFFIC` into a component, which is why
 `aws_core` is a declared vocabulary dependency.
 
 #### Acceptance Criteria
@@ -438,7 +448,7 @@ ends with another's. The graph's scene includes aws_core's `ROUTES_TRAFFIC` into
 | --- | --- | :---: | --- | --- |
 | req-gitlab-page-1 | Imports | Implemented | The bundle imports with its hotlinks satisfied. | `tests/test_gitlab_page.py` |
 | req-gitlab-page-2 | Every Search Runs | Implemented | Every search runs blank, named and unknown; unknown returns nothing. | |
-| req-gitlab-page-3 | Exact Instance | Implemented | A prefix of the instance's name selects nothing. | |
+| req-gitlab-page-3 | Prefix Selects Nothing | Implemented | A prefix of the instance's name selects nothing. | Not exact equality: see the overlap note above. |
 | req-gitlab-page-4 | Scene Covers The Deployment | Implemented | The scene searches together return every node of the example deployment that the vocabulary reaches. | The GitLab ECS cluster is not reached: aws_core has no cluster→service edge. |
 | req-gitlab-page-5 | Tables Get Nodes | Implemented | A table search returns typed nodes (envelope mode). | |
 | req-gitlab-page-6 | Renders | Proposed | The page renders in a browser with every slot filled and no console error. | Not yet observed: the page has not been booted into a stack. |
@@ -455,10 +465,10 @@ The in-package `ci` boot record (`req-boot-bootstrap-ci-record`) and the tests t
 
 #### Implementation
 
-`boot/ci.boot.json` installs `identity_core`, `aws_core` (the depends_on closure; neither declares
-dependencies) and this plugin, and seeds this plugin's page bundle. `tests/test_gitlab_manifest.py` runs
+`boot/ci.boot.json` installs `identity_core` and `aws_core` (the depends_on closure; neither declares
+dependencies), each pinned to a full commit SHA, and this plugin, and seeds this plugin's page bundle. `tests/test_gitlab_manifest.py` runs
 `validate_plugin` at structure and strict levels; `test_gitlab_instance.py`, `test_gitlab_models.py`,
-`test_gitlab_edges.py`, `test_gitlab_icons.py` and `test_gitlab_page.py` cover the requirements above;
+`test_gitlab_edges.py`, `test_gitlab_icons.py`, `test_gitlab_page.py` and `test_gitlab_posture.py` cover the requirements above;
 `tests/fixtures/example-deployment.grift.json` is the reference deployment (not declared in the manifest,
 never seeded).
 

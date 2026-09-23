@@ -6,14 +6,16 @@ Spec: specs/spec-gitlab-v0.md (req-gitlab-panel-posture).
 Each tile is declared in the panel instance's config, not here, so a consumer can ask its own questions:
 
     {"key": "...", "label": "...", "help": "...",
-     "population": ["MATCH (v:gitlab__ci_variable)", "WHERE <instance filter>", "RETURN v"],
-     "finding":    ["MATCH (v:gitlab__ci_variable)", "WHERE <instance filter> AND v.data.protected = false", "RETURN v"],
+     "population": [... objects whose deciding fact was OBSERVED, e.g. v.data.protected IS NOT NULL ...],
+     "finding":    [... the population's bad ones, e.g. v.data.protected = false ...],
+     "unobserved": [... objects whose deciding fact was NOT observed, e.g. v.data.protected IS NULL ...],  # optional
      "secondary":  {"label": "not masked", "query": [...]},          # optional
      "tone": "bad_if_any" | "good_if_any"}
 
-Three states, never two. A tile whose population is empty reads *not observed* — the grid holds none of
-that type for this instance, so a zero finding would claim a clean bill it cannot give. A tile whose query
-fails renders the failure. Only a populated, answered tile shows a count.
+Three states, never two. The population counts only objects whose deciding fact was observed, so an object
+nobody looked at can never make a tile read clear; the unobserved count says how many were left out. A tile
+whose population is empty reads *not observed*. A tile whose query fails renders the failure. Only a
+populated, answered tile shows a count.
 
 Reads go through Gryphon (``execute_gryphon_raw``) with two inputs the panel supplies: ``instance`` (the
 page's ``?instance=``, the instance's name; blank selects every instance) and ``cutoff`` (now + 30 days, ISO
@@ -55,6 +57,7 @@ class Tile:
     population: int = 0
     secondary_label: str = ""
     secondary_count: int | None = None
+    unobserved: int | None = None
     error: str = ""
 
 
@@ -102,6 +105,12 @@ def chooser(instances: list[str], selected: str, params: Any) -> dict[str, Any]:
     note = ""
     if selected and selected not in instances:
         note = f"No instance named “{selected[:60]}” is on the grid; every tile below reads not observed."
+    # The page's searches select by instance_name STARTS_WITH and ENDS_WITH the name (Gryphon has no
+    # param-absent predicate yet, tap#360), which also matches a longer name that begins and ends with it.
+    overlap = [n for n in instances if selected and n != selected and n.startswith(selected) and n.endswith(selected)]
+    if overlap:
+        note = (f"The page's tables and tiles also include {', '.join(overlap)}: its name begins and ends with "
+                f"“{selected[:60]}”, and the page cannot yet tell them apart.")
     if not selected:
         label = instances[0] if len(instances) == 1 else ("all instances" if instances else "no instance on the grid")
     else:
@@ -114,6 +123,8 @@ def answer(spec: dict[str, Any], inputs: dict[str, str]) -> Tile:
     tile = Tile(key=str(spec.get("key", "")), label=str(spec.get("label", "")), help=str(spec.get("help", "")), state="error")
     tone = spec.get("tone", "bad_if_any")
     try:
+        if spec.get("unobserved"):
+            tile.unobserved = _count(spec["unobserved"], inputs)
         tile.population = _count(spec["population"], inputs)
         if tile.population == 0:
             tile.state = "not_observed"
@@ -128,9 +139,9 @@ def answer(spec: dict[str, Any], inputs: dict[str, str]) -> Tile:
             tile.secondary_label = str(secondary.get("label", ""))
             tile.secondary_count = _count(secondary["query"], inputs)
     except Exception as exc:  # noqa: BLE001 — one failed tile must not blank the strip
-        logger.exception("[7c1f] gitlab posture tile %s failed", tile.key)
+        logger.exception("[7c1f] gitlab posture tile %s failed: %s", tile.key, exc)
         tile.state = "error"
-        tile.error = str(exc)[:300]
+        tile.error = "The query failed; see the server log ([7c1f])."
     return tile
 
 

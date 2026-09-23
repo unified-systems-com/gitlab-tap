@@ -23,13 +23,13 @@ observed", "could not read"); colour is a second channel, never the only one.
             <span class="glp-tile-label">{{ tile.label }}</span>
             {% if tile.state == "not_observed" %}
               <span class="glp-tile-value">–</span>
-              <span class="glp-tile-sub">not observed: none on the grid for this instance</span>
+              <span class="glp-tile-sub">not observed{% if tile.unobserved %}: {{ tile.unobserved }} never checked{% else %}: none on the grid for this instance{% endif %}</span>
             {% elif tile.state == "error" %}
               <span class="glp-tile-value">?</span>
               <span class="glp-tile-sub" title="{{ tile.error }}">could not read</span>
             {% else %}
               <span class="glp-tile-value">{{ tile.count }}</span>
-              <span class="glp-tile-sub">of {{ tile.population }}{% if tile.state == "clear" %} · clear{% endif %}{% if tile.secondary_count is not None %} · {{ tile.secondary_count }} {{ tile.secondary_label }}{% endif %}</span>
+              <span class="glp-tile-sub">of {{ tile.population }} observed{% if tile.state == "clear" %} · clear{% endif %}{% if tile.secondary_count is not None %} · {{ tile.secondary_count }} {{ tile.secondary_label }}{% endif %}{% if tile.unobserved %} · {{ tile.unobserved }} not observed{% endif %}</span>
             {% endif %}
           </li>
         {% endfor %}

@@ -6,14 +6,14 @@
   "batches": [
     {
       "batch_entity": {
-        "entity_id": "01a0cc75-d994-7521-8f3c-8fae6bb73706",
+        "entity_id": "01a0cc8d-36e5-75be-acb5-71e573fd7e3d",
         "entity_type": "batch",
-        "name": "gitlab page v0.1.0",
+        "name": "gitlab page v0.1.1",
         "dimensions": {}
       },
       "batch_node": {
         "source": "plugins.gitlab",
-        "name": "gitlab page v0.1.0",
+        "name": "gitlab page v0.1.1",
         "description": "The /gitlab page (req-gitlab-page): the deployment graph (projection, elevation, layout module, scene searches), the posture strip, and the operator tables with their searches. Every search takes ?instance=<name>."
       },
       "nodes": [
@@ -897,7 +897,7 @@
           "node": {
             "name": "GitLab posture",
             "slug": "gitlab-posture",
-            "description": "Which instance the page shows, then one tile per posture question an operator of a FedRAMP 20x environment answers first. A tile reads a count, clear, or not observed (the grid holds none of that type for the instance), never a zero it cannot vouch for.",
+            "description": "Which instance the page shows, then one tile per posture question an operator of a FedRAMP 20x environment answers first. A tile counts only what was observed, says how many were not, and reads not observed when nothing was, never a zero it cannot vouch for.",
             "view": "gitlab/panels/posture.html",
             "editor_view": "",
             "config": {
@@ -906,10 +906,10 @@
                 {
                   "key": "components",
                   "label": "Components reporting degraded or unhealthy",
-                  "help": "GitLab components and Gitaly nodes whose last health verdict was degraded or unhealthy. The second number counts those whose health has never been observed — unknown, not healthy.",
+                  "help": "GitLab components whose last health verdict was degraded or unhealthy, out of those whose health was observed. Components never checked are counted apart: unknown, not healthy.",
                   "population": [
                     "MATCH (c:gitlab__gitlab_component)",
-                    "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                    "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance AND c.data.health != \"\"",
                     "RETURN c"
                   ],
                   "finding": [
@@ -917,23 +917,20 @@
                     "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance AND c.data.health IN [\"degraded\", \"unhealthy\"]",
                     "RETURN c"
                   ],
-                  "secondary": {
-                    "label": "health not observed",
-                    "query": [
-                      "MATCH (c:gitlab__gitlab_component)",
-                      "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance AND c.data.health = \"\"",
-                      "RETURN c"
-                    ]
-                  },
+                  "unobserved": [
+                    "MATCH (c:gitlab__gitlab_component)",
+                    "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance AND c.data.health = \"\"",
+                    "RETURN c"
+                  ],
                   "tone": "bad_if_any"
                 },
                 {
                   "key": "gitaly-storage",
                   "label": "Gitaly on unsupported storage",
-                  "help": "Gitaly nodes whose repositories sit on NFS or EFS. GitLab supports only local block storage (an attached EBS volume) for Gitaly.",
+                  "help": "Gitaly nodes whose repositories sit on NFS or EFS, out of those whose volume's filesystem was observed. GitLab supports only local block storage (an attached EBS volume) for Gitaly.",
                   "population": [
-                    "MATCH (g:gitlab__gitaly_node)",
-                    "WHERE g.data.instance_name STARTS_WITH $instance AND g.data.instance_name ENDS_WITH $instance",
+                    "MATCH (g:gitlab__gitaly_node)-[e:STORES_REPOSITORIES_ON_VOLUME__gitlab]->(v)",
+                    "WHERE g.data.instance_name STARTS_WITH $instance AND g.data.instance_name ENDS_WITH $instance AND e.data.properties.filesystem IS NOT NULL",
                     "RETURN g"
                   ],
                   "finding": [
@@ -946,10 +943,10 @@
                 {
                   "key": "open-runners",
                   "label": "Instance runners open to any job",
-                  "help": "Instance-scoped runners that take untagged jobs from unprotected refs: any project's pipeline, including a fork's merge request, can run on them.",
+                  "help": "Instance-scoped runners that take untagged jobs from unprotected refs: any project's pipeline, including a fork's merge request, can run on them. Counted out of runners whose scope, untagged and ref settings were all observed.",
                   "population": [
                     "MATCH (r:gitlab__gitlab_runner)",
-                    "WHERE r.data.instance_name STARTS_WITH $instance AND r.data.instance_name ENDS_WITH $instance",
+                    "WHERE r.data.instance_name STARTS_WITH $instance AND r.data.instance_name ENDS_WITH $instance AND r.data.runner_type != \"\" AND r.data.run_untagged IS NOT NULL AND r.data.access_level != \"\"",
                     "RETURN r"
                   ],
                   "finding": [
@@ -957,15 +954,20 @@
                     "WHERE r.data.instance_name STARTS_WITH $instance AND r.data.instance_name ENDS_WITH $instance AND r.data.runner_type = \"instance_type\" AND r.data.run_untagged = true AND r.data.access_level = \"not_protected\"",
                     "RETURN r"
                   ],
+                  "unobserved": [
+                    "MATCH (r:gitlab__gitlab_runner)",
+                    "WHERE r.data.instance_name STARTS_WITH $instance AND r.data.instance_name ENDS_WITH $instance AND (r.data.runner_type = \"\" OR r.data.run_untagged IS NULL OR r.data.access_level = \"\")",
+                    "RETURN r"
+                  ],
                   "tone": "bad_if_any"
                 },
                 {
                   "key": "privileged",
                   "label": "Runner managers running jobs privileged",
-                  "help": "Runner managers configured to run jobs privileged. A privileged job can escape to its host and read other jobs' secrets. Read from config.toml; the GitLab API does not expose it, so the second number is those never observed.",
+                  "help": "Runner managers configured to run jobs privileged. A privileged job can escape to its host and read other jobs' secrets. Read from config.toml; the GitLab API does not expose it.",
                   "population": [
                     "MATCH (m:gitlab__runner_manager)",
-                    "WHERE m.data.instance_name STARTS_WITH $instance AND m.data.instance_name ENDS_WITH $instance",
+                    "WHERE m.data.instance_name STARTS_WITH $instance AND m.data.instance_name ENDS_WITH $instance AND m.data.privileged IS NOT NULL",
                     "RETURN m"
                   ],
                   "finding": [
@@ -973,23 +975,20 @@
                     "WHERE m.data.instance_name STARTS_WITH $instance AND m.data.instance_name ENDS_WITH $instance AND m.data.privileged = true",
                     "RETURN m"
                   ],
-                  "secondary": {
-                    "label": "not observed",
-                    "query": [
-                      "MATCH (m:gitlab__runner_manager)",
-                      "WHERE m.data.instance_name STARTS_WITH $instance AND m.data.instance_name ENDS_WITH $instance AND m.data.privileged IS NULL",
-                      "RETURN m"
-                    ]
-                  },
+                  "unobserved": [
+                    "MATCH (m:gitlab__runner_manager)",
+                    "WHERE m.data.instance_name STARTS_WITH $instance AND m.data.instance_name ENDS_WITH $instance AND m.data.privileged IS NULL",
+                    "RETURN m"
+                  ],
                   "tone": "bad_if_any"
                 },
                 {
                   "key": "variables",
                   "label": "CI/CD variables not protected",
-                  "help": "Variables every pipeline receives, including those on unprotected branches. The second number counts variables GitLab does not mask in job logs.",
+                  "help": "Variables every pipeline receives, including those on unprotected branches, out of those whose protection was observed. The second number counts variables GitLab does not mask in job logs.",
                   "population": [
                     "MATCH (v:gitlab__ci_variable)",
-                    "WHERE v.data.instance_name STARTS_WITH $instance AND v.data.instance_name ENDS_WITH $instance",
+                    "WHERE v.data.instance_name STARTS_WITH $instance AND v.data.instance_name ENDS_WITH $instance AND v.data.protected IS NOT NULL",
                     "RETURN v"
                   ],
                   "finding": [
@@ -1005,15 +1004,20 @@
                       "RETURN v"
                     ]
                   },
+                  "unobserved": [
+                    "MATCH (v:gitlab__ci_variable)",
+                    "WHERE v.data.instance_name STARTS_WITH $instance AND v.data.instance_name ENDS_WITH $instance AND v.data.protected IS NULL",
+                    "RETURN v"
+                  ],
                   "tone": "bad_if_any"
                 },
                 {
                   "key": "tokens-never-expire",
                   "label": "Access tokens that never expire",
-                  "help": "Active personal, group, project and impersonation tokens with no expiry date. The second number counts active tokens expiring in the next 30 days.",
+                  "help": "Live personal, group, project and impersonation tokens with no expiry date, out of tokens whose expiry was observed. The second number counts live tokens expiring in the next 30 days.",
                   "population": [
                     "MATCH (t:gitlab__access_token)",
-                    "WHERE t.data.instance_name STARTS_WITH $instance AND t.data.instance_name ENDS_WITH $instance",
+                    "WHERE t.data.instance_name STARTS_WITH $instance AND t.data.instance_name ENDS_WITH $instance AND t.data.expires IS NOT NULL",
                     "RETURN t"
                   ],
                   "finding": [
@@ -1029,15 +1033,20 @@
                       "RETURN t"
                     ]
                   },
+                  "unobserved": [
+                    "MATCH (t:gitlab__access_token)",
+                    "WHERE t.data.instance_name STARTS_WITH $instance AND t.data.instance_name ENDS_WITH $instance AND t.data.expires IS NULL",
+                    "RETURN t"
+                  ],
                   "tone": "bad_if_any"
                 },
                 {
                   "key": "deploy-keys-never-expire",
                   "label": "Deploy keys that never expire",
-                  "help": "Deploy keys with no expiry. The second number counts keys some project lets push.",
+                  "help": "Deploy keys with no expiry, out of keys whose expiry was observed. The second number counts keys some project lets push.",
                   "population": [
                     "MATCH (k:gitlab__deploy_key)",
-                    "WHERE k.data.instance_name STARTS_WITH $instance AND k.data.instance_name ENDS_WITH $instance",
+                    "WHERE k.data.instance_name STARTS_WITH $instance AND k.data.instance_name ENDS_WITH $instance AND k.data.expires IS NOT NULL",
                     "RETURN k"
                   ],
                   "finding": [
@@ -1053,6 +1062,11 @@
                       "RETURN k"
                     ]
                   },
+                  "unobserved": [
+                    "MATCH (k:gitlab__deploy_key)",
+                    "WHERE k.data.instance_name STARTS_WITH $instance AND k.data.instance_name ENDS_WITH $instance AND k.data.expires IS NULL",
+                    "RETURN k"
+                  ],
                   "tone": "bad_if_any"
                 },
                 {
@@ -1061,12 +1075,17 @@
                   "help": "Protected-branch rules that still allow force-push, which rewrites history the protection was meant to keep.",
                   "population": [
                     "MATCH (b:gitlab__protected_branch)",
-                    "WHERE b.data.instance_name STARTS_WITH $instance AND b.data.instance_name ENDS_WITH $instance",
+                    "WHERE b.data.instance_name STARTS_WITH $instance AND b.data.instance_name ENDS_WITH $instance AND b.data.allow_force_push IS NOT NULL",
                     "RETURN b"
                   ],
                   "finding": [
                     "MATCH (b:gitlab__protected_branch)",
                     "WHERE b.data.instance_name STARTS_WITH $instance AND b.data.instance_name ENDS_WITH $instance AND b.data.allow_force_push = true",
+                    "RETURN b"
+                  ],
+                  "unobserved": [
+                    "MATCH (b:gitlab__protected_branch)",
+                    "WHERE b.data.instance_name STARTS_WITH $instance AND b.data.instance_name ENDS_WITH $instance AND b.data.allow_force_push IS NULL",
                     "RETURN b"
                   ],
                   "tone": "bad_if_any"
@@ -1077,7 +1096,7 @@
                   "help": "Projects whose CI_JOB_TOKEN inbound allowlist is off: a job in any project on the instance can use its token against them.",
                   "population": [
                     "MATCH (p:gitlab__gitlab_project)",
-                    "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance",
+                    "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance AND p.data.job_token_inbound_enabled IS NOT NULL",
                     "RETURN p"
                   ],
                   "finding": [
@@ -1085,20 +1104,30 @@
                     "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance AND p.data.job_token_inbound_enabled = false",
                     "RETURN p"
                   ],
+                  "unobserved": [
+                    "MATCH (p:gitlab__gitlab_project)",
+                    "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance AND p.data.job_token_inbound_enabled IS NULL",
+                    "RETURN p"
+                  ],
                   "tone": "bad_if_any"
                 },
                 {
                   "key": "no-2fa",
                   "label": "Active people without GitLab 2FA",
-                  "help": "Active human accounts with no GitLab two-factor authentication. Where sign-in goes only through an SSO provider that enforces MFA, this is expected; the SSO table says whether it does.",
+                  "help": "Active human accounts with no GitLab two-factor authentication, out of human accounts whose 2FA status was observed. Where sign-in goes only through an SSO provider that enforces MFA, this is expected; the sign-in table says whether it does.",
                   "population": [
                     "MATCH (u:gitlab__gitlab_user)",
-                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.user_type = \"human\"",
+                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.user_type = \"human\" AND u.data.two_factor_enabled IS NOT NULL",
                     "RETURN u"
                   ],
                   "finding": [
                     "MATCH (u:gitlab__gitlab_user)",
                     "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.user_type = \"human\" AND u.data.state = \"active\" AND u.data.two_factor_enabled = false",
+                    "RETURN u"
+                  ],
+                  "unobserved": [
+                    "MATCH (u:gitlab__gitlab_user)",
+                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.user_type = \"human\" AND u.data.two_factor_enabled IS NULL",
                     "RETURN u"
                   ],
                   "tone": "bad_if_any"
@@ -1109,12 +1138,17 @@
                   "help": "Accounts with instance administrator rights. Not a finding by itself; the number an assessor asks for first.",
                   "population": [
                     "MATCH (u:gitlab__gitlab_user)",
-                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance",
+                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.is_admin IS NOT NULL",
                     "RETURN u"
                   ],
                   "finding": [
                     "MATCH (u:gitlab__gitlab_user)",
                     "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.is_admin = true",
+                    "RETURN u"
+                  ],
+                  "unobserved": [
+                    "MATCH (u:gitlab__gitlab_user)",
+                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.is_admin IS NULL",
                     "RETURN u"
                   ],
                   "tone": "bad_if_any"
@@ -1125,7 +1159,7 @@
                   "help": "Instances that still accept a password on the web sign-in page. With SSO in place, password sign-in is the path around it.",
                   "population": [
                     "MATCH (i:gitlab__gitlab_instance)",
-                    "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance",
+                    "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance AND i.data.password_auth_enabled_for_web IS NOT NULL",
                     "RETURN i"
                   ],
                   "finding": [
@@ -1133,14 +1167,11 @@
                     "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance AND i.data.password_auth_enabled_for_web = true",
                     "RETURN i"
                   ],
-                  "secondary": {
-                    "label": "not observed",
-                    "query": [
-                      "MATCH (i:gitlab__gitlab_instance)",
-                      "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance AND i.data.password_auth_enabled_for_web IS NULL",
-                      "RETURN i"
-                    ]
-                  },
+                  "unobserved": [
+                    "MATCH (i:gitlab__gitlab_instance)",
+                    "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance AND i.data.password_auth_enabled_for_web IS NULL",
+                    "RETURN i"
+                  ],
                   "tone": "bad_if_any"
                 },
                 {
