@@ -13,7 +13,8 @@ class SsoProvider(BaseModel):
     OpenID Connect provider, or LDAP.
 
     What the provider trusts is an edge: TRUSTS_ISSUER (identity_core) for an OIDC issuer, TRUSTS_SAML_IDP
-    for a SAML identity provider.
+    for a SAML identity provider. It has no free-form configuration field: GitLab's record for it carries
+    secret material, so only the promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """
@@ -39,7 +40,6 @@ class SsoProvider(BaseModel):
         "block_auto_created_users": {"type": ["boolean", "null"]},
         "auto_link_user": {"type": ["boolean", "null"]},
         "enforced": {"type": ["boolean", "null"]},
-        "configuration": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["instance_name", "name"]
@@ -61,8 +61,6 @@ class SsoProvider(BaseModel):
     auto_link_user = models.BooleanField(null=True, blank=True)
     # Whether this provider is the only way to sign in (password sign-in disabled).
     enforced = models.BooleanField(null=True, blank=True)
-    # The source record as read, for facts not promoted to a column.
-    configuration = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__sso_provider"

@@ -13,7 +13,8 @@ class CiVariable(BaseModel):
     jobs receive it and whether it can appear in a job log. The value is never stored.
 
     Identity is the scope, the key and the environment scope: the same key may be defined once per
-    environment.
+    environment. It has no free-form configuration field: GitLab's record for it carries secret material, so
+    only the promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """
@@ -42,7 +43,6 @@ class CiVariable(BaseModel):
         "hidden": {"type": ["boolean", "null"]},
         "raw": {"type": ["boolean", "null"]},
         "description": {"type": "string"},
-        "configuration": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["instance_name", "scope", "key"]
@@ -72,8 +72,6 @@ class CiVariable(BaseModel):
     raw = models.BooleanField(null=True, blank=True)
     # The variable's description.
     description = models.TextField(blank=True, default="")
-    # The source record as read, for facts not promoted to a column.
-    configuration = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__ci_variable"

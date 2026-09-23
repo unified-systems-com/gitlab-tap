@@ -78,5 +78,5 @@ gitlab_page = "grift/gitlab-page.grift.json"
 # of the record; regenerate with scripts/boot-record-hash --refresh in a core checkout.
 [[boot.records]]
 name = "ci"
-description = "RESERVED NAME (req-boot-bootstrap-ci-record): the stack this plugin's own tests run in — depends_on closure (empty) + self, offline, credential-free. The consumer flips self to editable."
-sha256 = "52f6bc0de1a64ddaf44fa0f691dea555d08ff0b46682d99bd4b151cfc0f8cd2b"
+description = "RESERVED NAME (req-boot-bootstrap-ci-record): the stack this plugin's own tests run in — depends_on closure (identity_core, aws_core, pinned) + self, credential-free, network only to install the pins. The consumer flips self to editable."
+sha256 = "6f2161b88f91a91b8715f7aac3e9b56e06efbf93e1c1414dd1fecb60cd2aafe0"

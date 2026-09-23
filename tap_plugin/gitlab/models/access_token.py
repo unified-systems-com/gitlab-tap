@@ -13,7 +13,8 @@ class AccessToken(BaseModel):
     expiry. The secret is never stored.
 
     The user the token authenticates as (the owner, or the bot user behind a group or project token) is
-    AUTHENTICATES_AS_USER.
+    AUTHENTICATES_AS_USER. It has no free-form configuration field: GitLab's record for it carries secret
+    material, so only the promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """
@@ -44,7 +45,6 @@ class AccessToken(BaseModel):
         "revoked": {"type": ["boolean", "null"]},
         "last_used_at": {"type": "string"},
         "created_at": {"type": "string"},
-        "configuration": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["instance_name", "owner_path", "name"]
@@ -77,8 +77,6 @@ class AccessToken(BaseModel):
     last_used_at = models.CharField(max_length=64, blank=True, default="")
     # When the token was created (ISO 8601).
     created_at = models.CharField(max_length=64, blank=True, default="")
-    # The source record as read, for facts not promoted to a column.
-    configuration = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__access_token"

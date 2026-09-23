@@ -92,3 +92,25 @@ def test_every_manifest_model_is_covered() -> None:
     manifest = tomllib.loads((Path(__file__).resolve().parents[1] / "tap-plugin.toml").read_text())
     declared = set(manifest["models"]) - {"gitlab__gitlab_instance"}
     assert declared == set(CASES)
+
+
+SECRET_BEARING = [
+    "gitlab__ci_variable", "gitlab__access_token", "gitlab__deploy_token", "gitlab__deploy_key",
+    "gitlab__sso_provider", "gitlab__audit_event_destination",
+]
+
+
+@pytest.mark.parametrize("type_slug", SECRET_BEARING)
+def test_secret_bearing_types_keep_no_raw_record(type_slug: str) -> None:
+    """GitLab's record for these carries secret material, so no free-form field could hold it."""
+    cls = get_model_class(type_slug)
+    assert "configuration" not in cls.FIELD_CRUD_SCHEMA
+    assert "configuration" not in {f.name for f in cls._meta.get_fields()}
+    assert not any(schema.get("type") in ("object", ["object", "null"]) for schema in cls.FIELD_CRUD_SCHEMA.values())
+
+
+@pytest.mark.django_db
+def test_a_value_cannot_be_smuggled_in() -> None:
+    """A write carrying the variable's value in an undeclared field is refused."""
+    assert not _create("gitlab__ci_variable", {"instance_name": "gl", "scope": "instance", "key": "K", "configuration": {"value": "sentinel"}}).success
+    assert not _create("gitlab__ci_variable", {"instance_name": "gl", "scope": "instance", "key": "K", "value": "sentinel"}).success

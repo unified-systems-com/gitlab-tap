@@ -12,7 +12,8 @@ class DeployToken(BaseModel):
     """A deploy token: a username and token pair minted on a group or project for reading repositories and
     reading or writing its registries.
 
-    Scoped to the group or project that issued it.
+    Scoped to the group or project that issued it. It has no free-form configuration field: GitLab's record
+    for it carries secret material, so only the promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """
@@ -39,7 +40,6 @@ class DeployToken(BaseModel):
         "expires": {"type": ["boolean", "null"]},
         "expires_at": {"type": "string"},
         "revoked": {"type": ["boolean", "null"]},
-        "configuration": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["instance_name", "scope_path", "name"]
@@ -64,8 +64,6 @@ class DeployToken(BaseModel):
     expires_at = models.CharField(max_length=64, blank=True, default="")
     # Whether the token has been revoked.
     revoked = models.BooleanField(null=True, blank=True)
-    # The source record as read, for facts not promoted to a column.
-    configuration = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__deploy_token"

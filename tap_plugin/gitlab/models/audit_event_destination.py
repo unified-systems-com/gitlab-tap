@@ -13,6 +13,8 @@ class AuditEventDestination(BaseModel):
     happens (an HTTP endpoint, an AWS S3 bucket, or Google Cloud Logging). Ultimate only.
 
     Where the events land is DELIVERS_EVENTS; which instance or group streams them is STREAMS_AUDIT_EVENTS.
+    It has no free-form configuration field: GitLab's record for it carries secret material, so only the
+    promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """
@@ -37,7 +39,6 @@ class AuditEventDestination(BaseModel):
         "destination_url": {"type": "string"},
         "active": {"type": ["boolean", "null"]},
         "event_type_filters": {"type": ["array", "null"], "items": {"type": "string"}},
-        "configuration": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["instance_name", "name"]
@@ -57,8 +58,6 @@ class AuditEventDestination(BaseModel):
     active = models.BooleanField(null=True, blank=True)
     # The event types streamed. Null is not observed; [] means all.
     event_type_filters = models.JSONField(null=True, blank=True, default=None)
-    # The source record as read, for facts not promoted to a column.
-    configuration = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__audit_event_destination"
