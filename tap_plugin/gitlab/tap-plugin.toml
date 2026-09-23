@@ -1,0 +1,20 @@
+manifest_version = "0"
+plugin_version = "0.1.0"
+requires_tap = ">=0.2.1"
+slug = "gitlab"
+name = "TAP GitLab"
+description = "GitLab as grid vocabulary: v0 carries one outer node, the GitLab instance (a self-managed server or gitlab.com), so a design can place it before anything is collected."
+
+# Pure Python, no dependencies, no crypto (spec-fips.md, req-tap-plugin-manifest-v0-fips).
+[fips]
+status = "compatible"
+
+[models]
+gitlab__gitlab_instance = "tap_plugin.gitlab.models.gitlab_instance.GitlabInstance"
+
+# In-package boot record (req-boot-bootstrap-records-in-package). Digest is the canonical sha256
+# of the record; regenerate with scripts/boot-record-hash --refresh in a core checkout.
+[[boot.records]]
+name = "ci"
+description = "RESERVED NAME (req-boot-bootstrap-ci-record): the stack this plugin's own tests run in — depends_on closure (empty) + self, offline, credential-free. The consumer flips self to editable."
+sha256 = "b5b7172d0f8ec006cdaeefa8e2c0312f8537fca82cae7b6b322b2314f7122fd5"
