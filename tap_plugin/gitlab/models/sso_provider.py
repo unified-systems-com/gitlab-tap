@@ -13,8 +13,8 @@ class SsoProvider(BaseModel):
     OpenID Connect provider, or LDAP.
 
     What the provider trusts is an edge: TRUSTS_ISSUER (identity_core) for an OIDC issuer, TRUSTS_SAML_IDP
-    for a SAML identity provider. It has no free-form configuration field: GitLab's record for it carries
-    secret material, so only the promoted columns are stored.
+    for a SAML identity provider. It has no free-form configuration field: the source records GitLab keeps
+    for it can carry secret material, so only promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """

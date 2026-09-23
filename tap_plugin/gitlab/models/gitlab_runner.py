@@ -14,7 +14,8 @@ class GitlabRunner(BaseModel):
 
     The registration, not the process: the process is gitlab__runner_manager. Scope is instance_type,
     group_type or project_type; an instance runner that runs untagged, unprotected jobs takes anyone's
-    pipeline.
+    pipeline. It has no free-form configuration field: the source records GitLab keeps for it can carry
+    secret material, so only promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """
@@ -43,7 +44,6 @@ class GitlabRunner(BaseModel):
         "paused": {"type": ["boolean", "null"]},
         "maximum_timeout": {"type": ["integer", "null"]},
         "status": {"type": "string", "enum": ["online", "offline", "stale", "never_contacted", ""]},
-        "configuration": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["instance_name", "name"]
@@ -71,8 +71,6 @@ class GitlabRunner(BaseModel):
     maximum_timeout = models.IntegerField(null=True, blank=True)
     # GitLab's contact status for the runner.
     status = models.CharField(max_length=32, blank=True, default="")
-    # The source record as read, for facts not promoted to a column.
-    configuration = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__gitlab_runner"

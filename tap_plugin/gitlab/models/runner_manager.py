@@ -13,7 +13,8 @@ class RunnerManager(BaseModel):
     jobs, and launches each job with its executor.
 
     A runner registration (gitlab__gitlab_runner) can be served by many managers; the manager is the process
-    that runs somewhere and holds the executor configuration.
+    that runs somewhere and holds the executor configuration. It has no free-form configuration field: the
+    source records GitLab keeps for it can carry secret material, so only promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-infrastructure).
     """
@@ -45,7 +46,6 @@ class RunnerManager(BaseModel):
         "image": {"type": "string"},
         "version": {"type": "string"},
         "fips_enabled": {"type": ["boolean", "null"]},
-        "configuration": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["instance_name", "name"]
@@ -80,8 +80,6 @@ class RunnerManager(BaseModel):
     version = models.CharField(max_length=64, blank=True, default="")
     # Whether the process runs in FIPS mode (a validated crypto provider is in use). Null means not observed.
     fips_enabled = models.BooleanField(null=True, blank=True)
-    # The source record as read, for facts not promoted to a column.
-    configuration = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__runner_manager"

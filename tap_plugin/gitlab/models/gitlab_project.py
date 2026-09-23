@@ -13,7 +13,8 @@ class GitlabProject(BaseModel):
     settings.
 
     Keyed by path with namespace inside its instance. The repository's bytes live on a Gitaly node
-    (RESIDES_ON_GITALY).
+    (RESIDES_ON_GITALY). It has no free-form configuration field: the source records GitLab keeps for it can
+    carry secret material, so only promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """
@@ -41,7 +42,6 @@ class GitlabProject(BaseModel):
         "shared_runners_enabled": {"type": ["boolean", "null"]},
         "job_token_inbound_enabled": {"type": ["boolean", "null"]},
         "fork_pipelines_in_parent": {"type": ["boolean", "null"]},
-        "configuration": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["instance_name", "full_path"]
@@ -68,8 +68,6 @@ class GitlabProject(BaseModel):
     job_token_inbound_enabled = models.BooleanField(null=True, blank=True)
     # Whether fork merge-request pipelines may run in this project, with this project's variables and runners.
     fork_pipelines_in_parent = models.BooleanField(null=True, blank=True)
-    # The source record as read, for facts not promoted to a column.
-    configuration = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__gitlab_project"

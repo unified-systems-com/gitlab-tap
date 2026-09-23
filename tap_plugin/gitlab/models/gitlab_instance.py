@@ -15,7 +15,8 @@ class GitlabInstance(BaseModel):
     (RUNS_COMPONENT), its groups and user accounts, its runners, sign-in providers and audit streams. It
     also carries the instance-wide sign-in posture, because those settings exist once per instance.
     A design can place it before any access exists, so every observed field stays blank (not observed)
-    until a collector reads it.
+    until a collector reads it. There is no free-form configuration field: the instance's application
+    settings carry keys and secrets, so only promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-model).
     """
@@ -50,7 +51,6 @@ class GitlabInstance(BaseModel):
         "password_auth_enabled_for_git": {"type": ["boolean", "null"]},
         "require_two_factor": {"type": ["boolean", "null"]},
         "signup_enabled": {"type": ["boolean", "null"]},
-        "configuration": {"type": "object"},
         "tags": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
@@ -74,7 +74,6 @@ class GitlabInstance(BaseModel):
     require_two_factor = models.BooleanField(null=True, blank=True)
     # Whether anyone may register an account.
     signup_enabled = models.BooleanField(null=True, blank=True)
-    configuration = models.JSONField(default=dict, blank=True)
     tags = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):

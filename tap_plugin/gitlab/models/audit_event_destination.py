@@ -13,8 +13,8 @@ class AuditEventDestination(BaseModel):
     happens (an HTTP endpoint, an AWS S3 bucket, or Google Cloud Logging). Ultimate only.
 
     Where the events land is DELIVERS_EVENTS; which instance or group streams them is STREAMS_AUDIT_EVENTS.
-    It has no free-form configuration field: GitLab's record for it carries secret material, so only the
-    promoted columns are stored.
+    It has no free-form configuration field: the source records GitLab keeps for it can carry secret
+    material, so only promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """

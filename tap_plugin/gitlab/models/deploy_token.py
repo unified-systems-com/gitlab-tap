@@ -12,8 +12,8 @@ class DeployToken(BaseModel):
     """A deploy token: a username and token pair minted on a group or project for reading repositories and
     reading or writing its registries.
 
-    Scoped to the group or project that issued it. It has no free-form configuration field: GitLab's record
-    for it carries secret material, so only the promoted columns are stored.
+    Scoped to the group or project that issued it. It has no free-form configuration field: the source
+    records GitLab keeps for it can carry secret material, so only promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """

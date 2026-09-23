@@ -75,6 +75,19 @@ def test_instance_filter_is_exact(grid: None) -> None:
     assert not _run("gitlab — scene: instances", {"instance": "Git"})["nodes"]
 
 
+@pytest.mark.xfail(strict=True, reason="Known over-match until tap#360: STARTS_WITH+ENDS_WITH selects 'ababa' for 'aba'. "
+                   "When this starts passing, switch every page search to equality and drop the strip's overlap note.")
+def test_overlapping_names_do_not_mix(grid: None) -> None:
+    from tap_grid.caller_context import CallerContext
+    from tap_grid.services import WriteOperation, write_batch
+
+    write_batch([WriteOperation(verb="create_node", type_slug="gitlab__access_token",
+                                payload={"instance_name": name, "owner_path": "alice", "name": "cli"})
+                 for name in ("aba", "ababa")], caller_context=CallerContext())
+    names = {n["data"]["instance_name"] for n in _run("gitlab — access tokens of an instance", {"instance": "aba"})["nodes"]}
+    assert names == {"aba"}
+
+
 def test_scene_reaches_the_whole_deployment(grid: None) -> None:
     """The scene searches together hold every node of the example deployment except the GitLab ECS
     cluster, which nothing in the vocabulary reaches (aws_core has no cluster-to-service edge)."""

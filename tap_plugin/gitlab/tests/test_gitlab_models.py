@@ -94,19 +94,19 @@ def test_every_manifest_model_is_covered() -> None:
     assert declared == set(CASES)
 
 
-SECRET_BEARING = [
-    "gitlab__ci_variable", "gitlab__access_token", "gitlab__deploy_token", "gitlab__deploy_key",
-    "gitlab__sso_provider", "gitlab__audit_event_destination",
-]
+#: Every type: a runner manager's config.toml holds its runner token, a variable's record its value, a
+#: component's configuration its database password, the instance's settings its keys.
+NO_RAW_RECORD = [*sorted(CASES), "gitlab__gitlab_instance"]
 
 
-@pytest.mark.parametrize("type_slug", SECRET_BEARING)
-def test_secret_bearing_types_keep_no_raw_record(type_slug: str) -> None:
-    """GitLab's record for these carries secret material, so no free-form field could hold it."""
+@pytest.mark.parametrize("type_slug", NO_RAW_RECORD)
+def test_no_type_keeps_a_raw_record(type_slug: str) -> None:
+    """GitLab's records can carry secret material, so no type has a free-form field that could hold it."""
     cls = get_model_class(type_slug)
     assert "configuration" not in cls.FIELD_CRUD_SCHEMA
     assert "configuration" not in {f.name for f in cls._meta.get_fields()}
-    assert not any(schema.get("type") in ("object", ["object", "null"]) for schema in cls.FIELD_CRUD_SCHEMA.values())
+    # `tags` (the instance's labels, set by whoever places it) is the one object field, and is not a source record.
+    assert not any(schema.get("type") in ("object", ["object", "null"]) for name, schema in cls.FIELD_CRUD_SCHEMA.items() if name != "tags")
 
 
 @pytest.mark.django_db
@@ -114,3 +114,4 @@ def test_a_value_cannot_be_smuggled_in() -> None:
     """A write carrying the variable's value in an undeclared field is refused."""
     assert not _create("gitlab__ci_variable", {"instance_name": "gl", "scope": "instance", "key": "K", "configuration": {"value": "sentinel"}}).success
     assert not _create("gitlab__ci_variable", {"instance_name": "gl", "scope": "instance", "key": "K", "value": "sentinel"}).success
+    assert not _create("gitlab__runner_manager", {"instance_name": "gl", "name": "m", "configuration": {"token": "sentinel"}}).success

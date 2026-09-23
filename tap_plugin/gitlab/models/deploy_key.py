@@ -13,8 +13,8 @@ class DeployKey(BaseModel):
     repositories without a user account.
 
     One key can be enabled on many projects; whether it may push is per project, on ENABLES_DEPLOY_KEY. It
-    has no free-form configuration field: GitLab's record for it carries secret material, so only the
-    promoted columns are stored.
+    has no free-form configuration field: the source records GitLab keeps for it can carry secret material,
+    so only promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """

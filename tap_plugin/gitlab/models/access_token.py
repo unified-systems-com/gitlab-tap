@@ -13,8 +13,8 @@ class AccessToken(BaseModel):
     expiry. The secret is never stored.
 
     The user the token authenticates as (the owner, or the bot user behind a group or project token) is
-    AUTHENTICATES_AS_USER. It has no free-form configuration field: GitLab's record for it carries secret
-    material, so only the promoted columns are stored.
+    AUTHENTICATES_AS_USER. It has no free-form configuration field: the source records GitLab keeps for it
+    can carry secret material, so only promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """

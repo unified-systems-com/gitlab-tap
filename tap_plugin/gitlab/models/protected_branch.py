@@ -13,7 +13,8 @@ class ProtectedBranch(BaseModel):
     may push to, merge into, or unprotect.
 
     Role-based grants are the *_access_levels columns; grants to a specific user, group or deploy key are
-    PERMITTED_ON_BRANCH edges.
+    PERMITTED_ON_BRANCH edges. It has no free-form configuration field: the source records GitLab keeps for
+    it can carry secret material, so only promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """
@@ -39,7 +40,6 @@ class ProtectedBranch(BaseModel):
         "unprotect_access_levels": {"type": ["array", "null"], "items": {"type": "integer"}},
         "allow_force_push": {"type": ["boolean", "null"]},
         "code_owner_approval_required": {"type": ["boolean", "null"]},
-        "configuration": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["instance_name", "project_path", "name"]
@@ -61,8 +61,6 @@ class ProtectedBranch(BaseModel):
     allow_force_push = models.BooleanField(null=True, blank=True)
     # Whether pushes and merges need Code Owner approval.
     code_owner_approval_required = models.BooleanField(null=True, blank=True)
-    # The source record as read, for facts not promoted to a column.
-    configuration = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__protected_branch"

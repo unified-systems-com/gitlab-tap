@@ -13,7 +13,8 @@ class GitlabComponent(BaseModel):
     the container registry, KAS, Pages, Mailroom, the exporter, or the toolbox/migrations task.
 
     A GitLab component is one of the processes the cloud-native split runs in containers. Gitaly is not one:
-    it is stateful and has its own type (gitlab__gitaly_node).
+    it is stateful and has its own type (gitlab__gitaly_node). It has no free-form configuration field: the
+    source records GitLab keeps for it can carry secret material, so only promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-infrastructure).
     """
@@ -41,7 +42,6 @@ class GitlabComponent(BaseModel):
         "health_check": {"type": "string"},
         "health": {"type": "string", "enum": ["healthy", "degraded", "unhealthy", ""]},
         "health_observed_at": {"type": "string"},
-        "configuration": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["instance_name", "name"]
@@ -68,8 +68,6 @@ class GitlabComponent(BaseModel):
     health = models.CharField(max_length=32, blank=True, default="")
     # When `health` was observed (ISO 8601). Blank with `health`.
     health_observed_at = models.CharField(max_length=64, blank=True, default="")
-    # The source record as read, for facts not promoted to a column.
-    configuration = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__gitlab_component"

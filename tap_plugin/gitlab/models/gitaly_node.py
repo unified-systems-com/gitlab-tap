@@ -13,7 +13,9 @@ class GitalyNode(BaseModel):
     them to every other component.
 
     Gitaly is the one GitLab component that holds repository data. GitLab supports only local storage for it
-    (block storage such as an attached EBS volume), never NFS or a cloud file system such as EFS.
+    (block storage such as an attached EBS volume), never NFS or a cloud file system such as EFS. It has no
+    free-form configuration field: the source records GitLab keeps for it can carry secret material, so only
+    promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-infrastructure).
     """
@@ -40,7 +42,6 @@ class GitalyNode(BaseModel):
         "fips_enabled": {"type": ["boolean", "null"]},
         "health": {"type": "string", "enum": ["healthy", "degraded", "unhealthy", ""]},
         "health_observed_at": {"type": "string"},
-        "configuration": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["instance_name", "name"]
@@ -64,8 +65,6 @@ class GitalyNode(BaseModel):
     health = models.CharField(max_length=32, blank=True, default="")
     # When `health` was observed (ISO 8601). Blank with `health`.
     health_observed_at = models.CharField(max_length=64, blank=True, default="")
-    # The source record as read, for facts not promoted to a column.
-    configuration = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__gitaly_node"

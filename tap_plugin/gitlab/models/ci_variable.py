@@ -13,8 +13,8 @@ class CiVariable(BaseModel):
     jobs receive it and whether it can appear in a job log. The value is never stored.
 
     Identity is the scope, the key and the environment scope: the same key may be defined once per
-    environment. It has no free-form configuration field: GitLab's record for it carries secret material, so
-    only the promoted columns are stored.
+    environment. It has no free-form configuration field: the source records GitLab keeps for it can carry
+    secret material, so only promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """

@@ -12,7 +12,9 @@ class GitlabUser(BaseModel):
     """A GitLab user account: a person, a service account, or a bot user behind a group or project access
     token.
 
-    Keyed by username inside its instance. user_type separates humans from service accounts and bots.
+    Keyed by username inside its instance. user_type separates humans from service accounts and bots. It has
+    no free-form configuration field: the source records GitLab keeps for it can carry secret material, so
+    only promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """
@@ -43,7 +45,6 @@ class GitlabUser(BaseModel):
         "locked": {"type": ["boolean", "null"]},
         "last_sign_in_at": {"type": "string"},
         "last_activity_on": {"type": "string"},
-        "configuration": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["instance_name", "username"]
@@ -75,8 +76,6 @@ class GitlabUser(BaseModel):
     last_sign_in_at = models.CharField(max_length=64, blank=True, default="")
     # The last day GitLab recorded activity for the account.
     last_activity_on = models.CharField(max_length=32, blank=True, default="")
-    # The source record as read, for facts not promoted to a column.
-    configuration = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__gitlab_user"

@@ -13,7 +13,8 @@ class GitlabEnvironment(BaseModel):
     to it and how many approvals a deployment needs.
 
     GitLab's own environment object, not TAP's deployment.environment dimension; a protected environment is
-    the same object with protection fields set.
+    the same object with protection fields set. It has no free-form configuration field: the source records
+    GitLab keeps for it can carry secret material, so only promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """
@@ -40,7 +41,6 @@ class GitlabEnvironment(BaseModel):
         "protected": {"type": ["boolean", "null"]},
         "required_approval_count": {"type": ["integer", "null"]},
         "deploy_access_levels": {"type": ["array", "null"], "items": {"type": "integer"}},
-        "configuration": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["instance_name", "project_path", "name"]
@@ -64,8 +64,6 @@ class GitlabEnvironment(BaseModel):
     required_approval_count = models.IntegerField(null=True, blank=True)
     # Roles allowed to deploy (30, 40, 60). Named users and groups are edges.
     deploy_access_levels = models.JSONField(null=True, blank=True, default=None)
-    # The source record as read, for facts not promoted to a column.
-    configuration = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__gitlab_environment"

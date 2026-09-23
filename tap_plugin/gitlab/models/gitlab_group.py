@@ -12,7 +12,9 @@ class GitlabGroup(BaseModel):
     """A GitLab group (or subgroup): a namespace that holds projects and subgroups and whose members inherit
     access to everything beneath it.
 
-    Keyed by full path inside its instance. Parentage is the NESTS_SUBGROUP edge, not a field.
+    Keyed by full path inside its instance. Parentage is the NESTS_SUBGROUP edge, not a field. It has no
+    free-form configuration field: the source records GitLab keeps for it can carry secret material, so only
+    promoted columns are stored.
 
     Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
     """
@@ -38,7 +40,6 @@ class GitlabGroup(BaseModel):
         "require_two_factor": {"type": ["boolean", "null"]},
         "two_factor_grace_period": {"type": ["integer", "null"]},
         "shared_runners_enabled": {"type": ["boolean", "null"]},
-        "configuration": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["instance_name", "full_path"]
@@ -60,8 +61,6 @@ class GitlabGroup(BaseModel):
     two_factor_grace_period = models.IntegerField(null=True, blank=True)
     # Whether instance runners may take this group's jobs.
     shared_runners_enabled = models.BooleanField(null=True, blank=True)
-    # The source record as read, for facts not promoted to a column.
-    configuration = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__gitlab_group"

@@ -152,7 +152,8 @@ whether anyone may register.
 `tap_plugin/gitlab/models/gitlab_instance.py`, `GitlabInstance`, `ENTITY_TYPE = "gitlab__gitlab_instance"`,
 icon `gitlab-instance`, no default dimensions. Fields: `name` (required), `base_url`, `edition` (`ce`/`ee`),
 `version`, `fips_mode`, `password_auth_enabled_for_web`, `password_auth_enabled_for_git`,
-`require_two_factor`, `signup_enabled` (all booleans nullable), `configuration`, `tags`.
+`require_two_factor`, `signup_enabled` (all booleans nullable), `tags`. v0's `configuration` field is removed
+(see `req-gitlab-models-application-6`).
 `NATURAL_KEY = ("name",)`: a design-phase node carries only its name; revisited when the collector makes
 `base_url` observable. Migration `0002_corpus_v1`.
 
@@ -227,11 +228,12 @@ instance-level variable's `scope_path` and `environment_scope` are empty because
 not apply; deploy token on `(scope_path, name)`; access token on `(owner_path, name)`. Credentials carry
 `expires` (false is the finding: never expires) beside `expires_at`, so "never expires" and "not observed"
 are different values. GitLab's numeric ids (`runner_id`, `group_id`, `project_id`, `user_id`,
-`deploy_key_id`, `deploy_token_id`, `token_id`) are nullable columns, not keys. The six types whose GitLab record carries secret
-material — CI/CD variable (its value), access token, deploy token, deploy key, SSO provider (an OIDC client
-secret), audit event destination (a verification token or access key) — have **no free-form `configuration`
-field**: only promoted columns are stored, so a collector cannot persist the secret into the live or
-historical tables by passing the record through.
+`deploy_key_id`, `deploy_token_id`, `token_id`) are nullable columns, not keys. **No type has a free-form `configuration` field**, the
+instance included: GitLab's source records carry secret material — a variable's value, a token, an OIDC
+client secret, an audit destination's verification token or access key, a runner manager's `config.toml`
+runner token, a component's database password, the instance's application-setting keys — so only promoted
+columns are stored, and a collector cannot persist a secret into the live or historical tables by passing a
+record through.
 
 #### Acceptance Criteria
 
@@ -242,7 +244,7 @@ historical tables by passing the record through.
 | req-gitlab-models-application-3 | Instance In The Key | Implemented | Every key rests on columns and begins with `instance_name`. | |
 | req-gitlab-models-application-4 | Unobserved Booleans Are Null | Implemented | A boolean nobody wrote reads null, never false. | |
 | req-gitlab-models-application-5 | Every Manifest Type Covered | Implemented | A type added to the manifest without a test case fails by name. | |
-| req-gitlab-models-application-6 | No Raw Record For Secret-Bearing Types | Implemented | The six secret-bearing types declare no object-typed field; a write carrying a value in an undeclared field is refused. | |
+| req-gitlab-models-application-6 | No Raw Record | Implemented | No type (instance included) declares an object-typed field other than the instance's `tags` labels; a write carrying a value or token in an undeclared field is refused. | Applies to the infrastructure types too. |
 
 ---
 
@@ -454,6 +456,7 @@ lands, then switch every search to equality. The graph's scene includes aws_core
 | req-gitlab-page-1 | Imports | Implemented | The bundle imports with its hotlinks satisfied. | `tests/test_gitlab_page.py` |
 | req-gitlab-page-2 | Every Search Runs | Implemented | Every search runs blank, named and unknown; unknown returns nothing. | |
 | req-gitlab-page-3 | Prefix Selects Nothing | Implemented | A prefix of the instance's name selects nothing. | Not exact equality: see the overlap note above. |
+| req-gitlab-page-7 | Overlapping Names Kept Apart | Backlog | Selecting `aba` never returns `ababa`'s rows. | Blocked on tap#360; `test_overlapping_names_do_not_mix` is a strict xfail that flips when it lands. |
 | req-gitlab-page-4 | Scene Covers The Deployment | Implemented | The scene searches together return every node of the example deployment that the vocabulary reaches. | The GitLab ECS cluster is not reached: aws_core has no cluster→service edge. |
 | req-gitlab-page-5 | Tables Get Nodes | Implemented | A table search returns typed nodes (envelope mode). | |
 | req-gitlab-page-6 | Renders | Proposed | The page renders in a browser with every slot filled and no console error. | Not yet observed: the page has not been booted into a stack. |
