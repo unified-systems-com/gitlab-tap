@@ -9,7 +9,7 @@ description = "GitLab as grid vocabulary: a small self-managed GitLab as deploye
 # trusts (TRUSTS_ISSUER__identity_core) and the human an account is held by (HELD_BY_HUMAN__identity_core); aws_core owns the load-balancer edge the /gitlab page's ingress
 # scene search names (ROUTES_TRAFFIC__aws_core). This plugin's own edges leave the AWS side open.
 depends_on = [
-    { slug = "identity_core", note = "Vocabulary dependency: an OIDC sign-in provider trusts an identity_core__oidc_issuer through identity_core's TRUSTS_ISSUER edge (req-gitlab-edges-application), and gitlab__gitlab_user declares HELD_BY_HUMAN__identity_core to identity_core__human, the one person every system's account resolves to (req-gitlab-person-link)." },
+    { slug = "identity_core", min_version = "0.1.3", note = "Vocabulary dependency: an OIDC sign-in provider trusts an identity_core__oidc_issuer through identity_core's TRUSTS_ISSUER edge (req-gitlab-edges-application), and gitlab__gitlab_user declares HELD_BY_HUMAN__identity_core to identity_core__human, the one person every system's account resolves to (req-gitlab-person-link)." },
     { slug = "aws_core", note = "Vocabulary dependency: the /gitlab page's ingress search names ROUTES_TRAFFIC__aws_core (a load balancer routing to a GitLab component), and the page draws aws_core nodes that GitLab processes run on and store to (req-gitlab-page)." },
 ]
 
@@ -79,4 +79,4 @@ gitlab_page = "grift/gitlab-page.grift.json"
 [[boot.records]]
 name = "ci"
 description = "RESERVED NAME (req-boot-bootstrap-ci-record): the stack this plugin's own tests run in — depends_on closure (identity_core, aws_core, pinned) + self, credential-free, network only to install the pins. The consumer flips self to editable."
-sha256 = "671dd136d6d4bd42bbd1e36921e97375e7b428b88edd299eeeb4ddaf47b1a005"
+sha256 = "748533019eb966b5a8a6447c1adbf45bf08c4f60ff7d5c9ab6f05323cd06bccd"

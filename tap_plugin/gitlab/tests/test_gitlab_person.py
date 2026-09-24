@@ -35,7 +35,7 @@ def _edge(src: str, dst: str, edge_type: str, properties: dict | None = None):
 
 def test_person_link_is_declared() -> None:
     """req-gitlab-person-link-1: the user type names the edge and the human, and the edge's owner is a declared
-    dependency."""
+    dependency, floored at the release that ships the human."""
     declared = {
         (e["type"], n["type"])
         for entry in GitlabUser.OUTBOUND_EDGES
@@ -44,7 +44,9 @@ def test_person_link_is_declared() -> None:
     }
     assert declared == {(HELD, HUMAN)}
     manifest = tomllib.loads((PKG / "tap-plugin.toml").read_text())
-    assert "identity_core" in {d["slug"] for d in manifest.get("depends_on", [])}
+    deps = {d["slug"]: d for d in manifest.get("depends_on", [])}
+    # The floor is the first identity_core release that ships identity_core__human.
+    assert deps["identity_core"].get("min_version") == "0.1.3"
 
 
 @pytest.mark.django_db
