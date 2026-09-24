@@ -10,7 +10,7 @@ observed", "could not read"); colour is a second channel, never the only one.
       <h2 class="glp-title">GitLab <span class="glp-instance">· {{ chooser.label }}</span></h2>
       {% if chooser.options|length > 1 %}
         <nav class="glp-chooser" aria-label="Instance">
-          <a class="glp-chooser-opt{% if not selected %} is-active{% endif %}" href="{{ chooser.all_href }}">All</a>
+          <a class="glp-chooser-opt{% if selected is None %} is-active{% endif %}" href="{{ chooser.all_href }}">All</a>
           {% for opt in chooser.options %}<a class="glp-chooser-opt{% if opt.active %} is-active{% endif %}" href="{{ opt.href }}"{% if opt.active %} aria-current="true"{% endif %}>{{ opt.name }}</a>{% endfor %}
         </nav>
       {% endif %}

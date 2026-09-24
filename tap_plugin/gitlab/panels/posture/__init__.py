@@ -18,7 +18,8 @@ whose population is empty reads *not observed*. A tile whose query fails renders
 populated, answered tile shows a count.
 
 Reads go through Gryphon (``execute_gryphon_raw``) with two inputs the panel supplies: ``instance`` (the
-page's ``?instance=``, the instance's name; blank selects every instance) and ``cutoff`` (now + 30 days, ISO
+page's ``?instance=``, the instance's name, matched exactly; absent is null, every instance; a blank value names no
+instance, as it does for the page's searches) and ``cutoff`` (now + 30 days, ISO
 8601, for expiry questions). A query is handed only the inputs it names.
 """
 
@@ -76,7 +77,8 @@ class PosturePanelType:
     def get_view_context(cls, panel: Panel, request: HttpRequest) -> dict[str, Any]:
         config = dict(cls.config_defaults)
         config.update(panel.config or {})
-        selected = str(request.GET.get("instance", "") or "")
+        raw = request.GET.get("instance")
+        selected = None if raw is None else str(raw)
         inputs = {"instance": selected, "cutoff": (datetime.now(UTC) + EXPIRY_WINDOW).strftime("%Y-%m-%dT%H:%M:%SZ")}
         try:
             instances = _names(_run(INSTANCE_QUERY, {}))
@@ -91,8 +93,9 @@ class PosturePanelType:
         }
 
 
-def chooser(instances: list[str], selected: str, params: Any) -> dict[str, Any]:
-    """The instance links. Blank selects every instance, which is the single instance when there is one."""
+def chooser(instances: list[str], selected: str | None, params: Any) -> dict[str, Any]:
+    """The instance links. Absent (``None``) selects every instance, which is the single instance when there is
+    one; any value, blank included, is matched exactly, as the page's searches match it."""
     options = []
     for name in instances:
         try:
@@ -103,22 +106,16 @@ def chooser(instances: list[str], selected: str, params: Any) -> dict[str, Any]:
             href = "?" + urlencode({"instance": name})
         options.append({"name": name, "href": href, "active": name == selected})
     note = ""
-    if selected and selected not in instances:
+    if selected is not None and selected not in instances:
         note = f"No instance named “{selected[:60]}” is on the grid; every tile below reads not observed."
-    # The page's searches select by instance_name STARTS_WITH and ENDS_WITH the name (Gryphon has no
-    # param-absent predicate yet, tap#360), which also matches a longer name that begins and ends with it.
-    overlap = [n for n in instances if selected and n != selected and n.startswith(selected) and n.endswith(selected)]
-    if overlap:
-        note = (f"The page's tables and tiles also include {', '.join(overlap)}: its name begins and ends with "
-                f"“{selected[:60]}”, and the page cannot yet tell them apart.")
-    if not selected:
+    if selected is None:
         label = instances[0] if len(instances) == 1 else ("all instances" if instances else "no instance on the grid")
     else:
         label = selected
     return {"options": options, "label": label, "note": note, "all_href": "?" + _without(params, "instance")}
 
 
-def answer(spec: dict[str, Any], inputs: dict[str, str]) -> Tile:
+def answer(spec: dict[str, Any], inputs: dict[str, str | None]) -> Tile:
     """Run one tile's population, finding and secondary queries."""
     tile = Tile(key=str(spec.get("key", "")), label=str(spec.get("label", "")), help=str(spec.get("help", "")), state="error")
     tone = spec.get("tone", "bad_if_any")
@@ -145,13 +142,13 @@ def answer(spec: dict[str, Any], inputs: dict[str, str]) -> Tile:
     return tile
 
 
-def _count(query: list[str] | str, inputs: dict[str, str]) -> int:
+def _count(query: list[str] | str, inputs: dict[str, str | None]) -> int:
     text = " ".join(query) if isinstance(query, list) else str(query)
     env = _run(text, {k: v for k, v in inputs.items() if f"${k}" in text})
     return len(env.get("nodes") or [])
 
 
-def _run(query: str, inputs: dict[str, str]) -> dict[str, Any]:
+def _run(query: str, inputs: dict[str, str | None]) -> dict[str, Any]:
     from tap_grid.gryphon.executor import execute_gryphon_raw
 
     return execute_gryphon_raw(query, inputs, layer="full")

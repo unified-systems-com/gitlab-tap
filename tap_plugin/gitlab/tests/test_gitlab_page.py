@@ -61,8 +61,19 @@ def _edge_type(edge: dict) -> str:
     raise AssertionError(f"no edge_type in {sorted(edge)}")
 
 
+def test_every_search_takes_a_nullable_instance() -> None:
+    """Every page search declares `instance` nullable with a null default and filters exact-or-all with
+    `$instance IS NULL OR …`."""
+    for spec in _nodes(PAGE, "search"):
+        instance = spec["node"]["input_schema"]["properties"]["instance"]
+        assert instance["type"] == ["string", "null"] and instance["default"] is None, spec["entity"]["name"]
+        query = " ".join(spec["node"]["definition"]["query"])
+        assert "$instance IS NULL OR" in query and "STARTS_WITH" not in query, spec["entity"]["name"]
+    assert "STARTS_WITH" not in json.dumps(PAGE), "a posture tile still carries the old approximation"
+
+
 def test_every_search_runs_for_all_one_and_no_instance(grid: None) -> None:
-    """Every page search executes with the instance blank, named, and unknown; unknown returns nothing."""
+    """Every page search executes with the instance absent, named, and unknown; unknown returns nothing."""
     for name in SEARCHES:
         _run(name, {})
         _run(name, {"instance": "GitLab"})
@@ -70,14 +81,13 @@ def test_every_search_runs_for_all_one_and_no_instance(grid: None) -> None:
 
 
 def test_instance_filter_is_exact(grid: None) -> None:
-    """A prefix of the instance's name selects nothing (STARTS_WITH and ENDS_WITH together)."""
+    """A prefix of the instance's name selects nothing: the name is matched exactly."""
     assert _run("gitlab — scene: instances", {"instance": "GitLab"})["nodes"]
     assert not _run("gitlab — scene: instances", {"instance": "Git"})["nodes"]
 
 
-@pytest.mark.xfail(strict=True, reason="Known over-match until tap#360: STARTS_WITH+ENDS_WITH selects 'ababa' for 'aba'. "
-                   "When this starts passing, switch every page search to equality and drop the strip's overlap note.")
 def test_overlapping_names_do_not_mix(grid: None) -> None:
+    """?instance=aba selects aba alone, never ababa (whose name begins and ends with it); absent selects both."""
     from tap_grid.caller_context import CallerContext
     from tap_grid.services import WriteOperation, write_batch
 
@@ -86,6 +96,8 @@ def test_overlapping_names_do_not_mix(grid: None) -> None:
                  for name in ("aba", "ababa")], caller_context=CallerContext())
     names = {n["data"]["instance_name"] for n in _run("gitlab — access tokens of an instance", {"instance": "aba"})["nodes"]}
     assert names == {"aba"}
+    every = {n["data"]["instance_name"] for n in _run("gitlab — access tokens of an instance", {})["nodes"]}
+    assert {"aba", "ababa"} <= every
 
 
 def test_scene_reaches_the_whole_deployment(grid: None) -> None:
