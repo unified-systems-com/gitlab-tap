@@ -32,7 +32,7 @@ all built.
 | `gitlab__gitlab_runner` | vendor | 2 | Cartography `GitLabRunner`; GitLab Runner API; Glato/Trajan (self-hosted runner enumeration). Scope, tags, run-untagged and access level decide whose jobs it takes. |
 | `gitlab__gitlab_group` | vendor | 2 | Cartography `GitLabGroup`/`GitLabOrganization`; GitLabHound `GL_Group`; GitLab API. |
 | `gitlab__gitlab_project` | vendor | 2 | Cartography `GitLabProject`; GitLabHound `GL_Project`; GitLab API. Links to the neutral `git_core__git_repository` are Backlog (`req-gitlab-neutral-links`). |
-| `gitlab__gitlab_user` | vendor | 2 | Cartography `GitLabUser`; GitLabHound `GL_User`; GitLab Users and Service Accounts APIs. One type for people, service accounts and token bot users, separated by `user_type`. |
+| `gitlab__gitlab_user` | vendor | 2 | Cartography `GitLabUser`; GitLabHound `GL_User`; GitLab Users and Service Accounts APIs. One type for people, service accounts and token bot users, separated by `user_type`. An account a person holds points at `identity_core__human` with identity_core's `HELD_BY_HUMAN`; a service account or bot user should not (the drawer's rule, not a grid constraint). |
 | `gitlab__protected_branch` | vendor | 2 | GitLab Protected Branches API; GitLabHound `GL_CanPush`/`GL_CanMerge`; CVE-2023-4812 (Code Owner approval bypass). Not in Cartography. |
 | `gitlab__gitlab_environment` | vendor | 2 | Cartography `GitLabEnvironment`; GitLab Environments and Protected Environments APIs. Protection is fields on the same object, not a second type. |
 | `gitlab__ci_variable` | vendor | 2 | Cartography `GitLabCIVariable`; GitLabHound `GL_Variable` family; the unprotected-variable-to-fork-pipeline failure. The value is never modelled. |
@@ -108,6 +108,7 @@ edge for the same fact.
 | Leaked secret (GitLabHound `GL_LeakedSecret`) | not modelled | A finding, not an object: belongs to a scanner plugin's findings against the variable or log it came from. |
 | Praefect as a component | `deployment_mode` on Gitaly, Backlog | Not needed below ~2,000 users; the reference deployment has one Gitaly. |
 | `storage_backend` field on Gitaly | `filesystem` on `STORES_REPOSITORIES_ON_VOLUME` | The fact is about the mount, and the volume's type is the far node. |
+| Email as the link from an account to its person (Cartography matches `Human` on email) | `HELD_BY_HUMAN__identity_core` → `identity_core__human`, drawn by whoever knows the match | Email is an account attribute that is reassigned and aliased; a join on it would merge two people. |
 | Issuer URL field on the SSO provider | `TRUSTS_ISSUER__identity_core` → `identity_core__oidc_issuer` | identity_core already holds the issuer URL; a copy here would be the same fact twice. |
 | An instance dimension (`gitlab.instance: <name>`) | `instance_name` key column | Dimensions are ignored by natural-key lookup (`req-grid-entity-natural-key-10`); identity needs a column. |
 

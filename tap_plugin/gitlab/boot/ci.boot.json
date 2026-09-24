@@ -9,9 +9,9 @@
         "source": {
           "type": "git",
           "url": "https://github.com/unified-systems-com/tap-plugin-identity-core",
-          "rev": "fb80f4150a288007e511b4adf34e244dafe8608b"
+          "rev": "53da388b6f47590090ef3bdc8d98731acff4c8e2"
         },
-        "note": "Vocabulary dependency: owns identity_core__oidc_issuer and TRUSTS_ISSUER, which an OIDC sign-in provider points at. Pinned to the full commit of its main on 2026-09-22 until it has a tagged release; move the pin deliberately."
+        "note": "Vocabulary dependency: owns identity_core__oidc_issuer and TRUSTS_ISSUER, which an OIDC sign-in provider points at, and identity_core__human and HELD_BY_HUMAN, which a user account points at. Pinned to the full commit of its main on 2026-09-24, the first carrying the human (no tagged release does yet; v0.1.2 predates it); move the pin deliberately."
       },
       {
         "slug": "aws_core",
