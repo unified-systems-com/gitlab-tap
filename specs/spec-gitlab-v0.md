@@ -334,9 +334,13 @@ A GitLab user account that a person holds resolves to that person: `identity_cor
 substrate type keyed on an operator-assigned handle), through identity_core's `HELD_BY_HUMAN__identity_core`,
 whose source is wildcard so no substrate depends upward on GitLab. The same person's Okta, Duo and Teleport
 accounts point at the same node, which is what an access review joins on. `gitlab__gitlab_user` holds people,
-service accounts and token bot users in one type, so the edge is drawn only for an account a person holds;
-a service account or bot user has none, and neither does an account nobody has matched yet (the unmatched
-state an access review must show). The edge is drawn by whoever knows the match (an operator's seed, an HR
+service accounts and token bot users in one type, so the edge is meant only for an account a person holds;
+a service account or bot user should have none, and neither does an account nobody has matched yet (the
+unmatched state an access review must show). **This is the drawer's rule, not a grid constraint.** Edge
+permission is per type (`req-grid-edge-constraints`), and `HELD_BY_HUMAN__identity_core`'s source is
+wildcard, so the grid accepts the edge from any `gitlab_user` whatever its `user_type`; a reader that
+wants people's accounts filters on `user_type` too. A collector that draws this edge must draw it only
+from `user_type = human`. The edge is drawn by whoever knows the match (an operator's seed, an HR
 feed, a collector matching an immutable id) and records how in `matched_on`; it is never inferred from a
 shared email or display name. An account held by two people (a shared login) keeps both edges.
 
@@ -345,7 +349,8 @@ shared email or display name. An account held by two people (a shared login) kee
 `GitlabUser.OUTBOUND_EDGES` declares `{"nodes": [{"type": "identity_core__human"}], "edges": [{"type":
 "HELD_BY_HUMAN__identity_core"}]}`. Under the permission union (`tap_grid/constraints.py::validate_edge`) this
 adds one permission and constrains nothing else: every gitlab edge from a user is still permitted by its own
-edge file. `identity_core` was already in `depends_on`; its note now names this edge too, and the `ci`
+edge file. The edge's wildcard source already permits it; the declaration records the intent on the model and
+is what `validate_plugin`'s `edge-declarations` check resolves through the declared dependency. `identity_core` was already in `depends_on`; its note now names this edge too, and the `ci`
 record's identity_core pin moved to the first commit carrying the human.
 
 #### Acceptance Criteria
@@ -353,7 +358,7 @@ record's identity_core pin moved to the first commit carrying the human.
 | ACID | Title | Status | Description | Notes |
 | --- | --- | :---: | --- | --- |
 | req-gitlab-person-link-1 | Declared | Implemented | `GitlabUser` declares `HELD_BY_HUMAN__identity_core` to `identity_core__human` in `OUTBOUND_EDGES`, and `identity_core` is in `depends_on`. | `test_person_link_is_declared` |
-| req-gitlab-person-link-2 | Written Through The Service Layer | Implemented | A user writes `HELD_BY_HUMAN__identity_core` to a human with `matched_on`; an unknown property is refused. | `test_account_is_held_by_a_human` |
+| req-gitlab-person-link-2 | Written Through The Service Layer | Implemented | A user writes `HELD_BY_HUMAN__identity_core` to a human with `matched_on`; an unknown property on a fresh pair is refused, naming the property. | `test_account_is_held_by_a_human` |
 | req-gitlab-person-link-3 | Shared Account Recorded | Implemented | One user may be held by two humans; both edges stand. | `test_shared_account_is_recorded` |
 | req-gitlab-person-link-4 | Nothing Else Constrained | Implemented | Declaring `OUTBOUND_EDGES` leaves the user's own gitlab edges (`MEMBER_OF_PROJECT`, `SIGNS_IN_VIA_PROVIDER`) writable. | `test_own_edges_still_permitted` |
 

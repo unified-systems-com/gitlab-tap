@@ -55,7 +55,12 @@ def test_account_is_held_by_a_human() -> None:
     result = _edge(user, human, HELD, {"matched_on": "operator seed"})
     assert result.success, result
     assert Edge.objects.get(entity_id=result.entity_id).properties == {"matched_on": "operator seed"}
-    assert not _edge(user, human, HELD, {"matched_by": "email"}).success
+    # A fresh pair, so the refusal can only come from the property schema.
+    other_human = _node(HUMAN, {"handle": "t-0002"})
+    other_user = _node("gitlab__gitlab_user", {"instance_name": "gl", "username": "tother", "user_type": "human"})
+    refused = _edge(other_user, other_human, HELD, {"matched_by": "email"})
+    assert not refused.success
+    assert "matched_by" in " ".join(str(e) for e in refused.errors), refused.errors
 
 
 @pytest.mark.django_db

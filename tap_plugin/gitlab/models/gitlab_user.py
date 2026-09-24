@@ -13,9 +13,11 @@ class GitlabUser(BaseModel):
     token.
 
     Keyed by username inside its instance. user_type separates humans from service accounts and bots. An
-    account a person holds points at identity_core's neutral human with HELD_BY_HUMAN__identity_core, drawn
-    only for accounts a person holds (never for a service account or a token bot user) and never inferred
-    from a shared email or display name. It has
+    account a person holds points at identity_core's neutral human with HELD_BY_HUMAN__identity_core. The
+    edge is meant only for accounts a person holds, not for a service account or a token bot user, and is
+    never inferred from a shared email or display name. That is the drawer's rule, not a grid constraint:
+    permissions are per type and the edge's source is wildcard, so a reader that wants people's accounts
+    filters on user_type as well. It has
     no free-form configuration field: the source records GitLab keeps for it can carry secret material, so
     only promoted columns are stored.
 
