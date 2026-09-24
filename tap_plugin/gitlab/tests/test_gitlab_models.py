@@ -105,8 +105,7 @@ def test_no_type_keeps_a_raw_record(type_slug: str) -> None:
     cls = get_model_class(type_slug)
     assert "configuration" not in cls.FIELD_CRUD_SCHEMA
     assert "configuration" not in {f.name for f in cls._meta.get_fields()}
-    # `tags` (the instance's labels, set by whoever places it) is the one object field, and is not a source record.
-    assert not any(schema.get("type") in ("object", ["object", "null"]) for name, schema in cls.FIELD_CRUD_SCHEMA.items() if name != "tags")
+    assert not any(schema.get("type") in ("object", ["object", "null"]) for schema in cls.FIELD_CRUD_SCHEMA.values())
 
 
 @pytest.mark.django_db

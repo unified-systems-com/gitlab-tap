@@ -51,7 +51,6 @@ class GitlabInstance(BaseModel):
         "password_auth_enabled_for_git": {"type": ["boolean", "null"]},
         "require_two_factor": {"type": ["boolean", "null"]},
         "signup_enabled": {"type": ["boolean", "null"]},
-        "tags": {"type": "object"},
     }
     FIELD_VALIDATION_SCHEMA: ClassVar[dict[str, Any]] = validation_schema(FIELD_CRUD_SCHEMA)
     CREATE_REQUIRED: ClassVar[list[str]] = ["name"]
@@ -74,7 +73,6 @@ class GitlabInstance(BaseModel):
     require_two_factor = models.BooleanField(null=True, blank=True)
     # Whether anyone may register an account.
     signup_enabled = models.BooleanField(null=True, blank=True)
-    tags = models.JSONField(default=dict, blank=True)
 
     class Meta(BaseModel.Meta):
         db_table = "gitlab__gitlab_instance"

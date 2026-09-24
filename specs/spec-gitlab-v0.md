@@ -153,7 +153,7 @@ whether anyone may register.
 `tap_plugin/gitlab/models/gitlab_instance.py`, `GitlabInstance`, `ENTITY_TYPE = "gitlab__gitlab_instance"`,
 icon `gitlab-instance`, no default dimensions. Fields: `name` (required), `base_url`, `edition` (`ce`/`ee`),
 `version`, `fips_mode`, `password_auth_enabled_for_web`, `password_auth_enabled_for_git`,
-`require_two_factor`, `signup_enabled` (all booleans nullable), `tags`. v0's `configuration` field is removed
+`require_two_factor`, `signup_enabled` (all booleans nullable). v0's `configuration` field is removed, and so is the `tags` labels map (migration `0003`: nothing read it, and a shapeless map is the same unreviewed-blob risk)
 (see `req-gitlab-models-application-6`); migration `0002` drops the column and its history without copying
 it. That is deliberate: v0 never observed anything, highbar's seed never wrote the field, and a grid that
 did put a record there held exactly the secret material the removal exists to keep out.
@@ -248,7 +248,7 @@ record through. The one free-text field that could still carry a credential, an 
 | req-gitlab-models-application-3 | Instance In The Key | Implemented | Every key rests on columns and begins with `instance_name`. | |
 | req-gitlab-models-application-4 | Unobserved Booleans Are Null | Implemented | A boolean nobody wrote reads null, never false. | |
 | req-gitlab-models-application-5 | Every Manifest Type Covered | Implemented | A type added to the manifest without a test case fails by name. | |
-| req-gitlab-models-application-6 | No Raw Record | Implemented | No type (instance included) declares an object-typed field other than the instance's `tags` labels; a write carrying a value or token in an undeclared field is refused. | Applies to the infrastructure types too. |
+| req-gitlab-models-application-6 | No Raw Record | Implemented | No type (instance included) declares an object-typed field; a write carrying a value or token in an undeclared field is refused. | Applies to the infrastructure types too. |
 | req-gitlab-models-application-7 | No Credential In A URL | Implemented | An audit destination URL with user info, a query or a fragment is refused. | `test_destination_url_carries_no_credential` |
 
 ---
