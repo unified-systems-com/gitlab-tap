@@ -351,13 +351,14 @@ shared email or display name. An account held by two people (a shared login) kee
 adds one permission and constrains nothing else: every gitlab edge from a user is still permitted by its own
 edge file. The edge's wildcard source already permits it; the declaration records the intent on the model and
 is what `validate_plugin`'s `edge-declarations` check resolves through the declared dependency. `identity_core` was already in `depends_on`; its note now names this edge too, and the `ci`
-record's identity_core pin moved to the first commit carrying the human.
+record's identity_core pin moved to the first commit carrying the human, which is the `v0.1.3` tag; `depends_on`
+declares that release as the floor (`min_version = "0.1.3"`).
 
 #### Acceptance Criteria
 
 | ACID | Title | Status | Description | Notes |
 | --- | --- | :---: | --- | --- |
-| req-gitlab-person-link-1 | Declared | Implemented | `GitlabUser` declares `HELD_BY_HUMAN__identity_core` to `identity_core__human` in `OUTBOUND_EDGES`, and `identity_core` is in `depends_on`. | `test_person_link_is_declared` |
+| req-gitlab-person-link-1 | Declared | Implemented | `GitlabUser` declares `HELD_BY_HUMAN__identity_core` to `identity_core__human` in `OUTBOUND_EDGES`, and `identity_core` is in `depends_on` with `min_version = "0.1.3"`. | `test_person_link_is_declared` |
 | req-gitlab-person-link-2 | Written Through The Service Layer | Implemented | A user writes `HELD_BY_HUMAN__identity_core` to a human with `matched_on`; an unknown property on a fresh pair is refused, naming the property. | `test_account_is_held_by_a_human` |
 | req-gitlab-person-link-3 | Shared Account Recorded | Implemented | One user may be held by two humans; both edges stand. | `test_shared_account_is_recorded` |
 | req-gitlab-person-link-4 | Nothing Else Constrained | Implemented | Declaring `OUTBOUND_EDGES` leaves the user's own gitlab edges (`MEMBER_OF_PROJECT`, `SIGNS_IN_VIA_PROVIDER`) writable. | `test_own_edges_still_permitted` |
@@ -519,7 +520,7 @@ The in-package `ci` boot record (`req-boot-bootstrap-ci-record`) and the tests t
 #### Implementation
 
 `boot/ci.boot.json` installs `identity_core` and `aws_core` (the depends_on closure; neither declares
-dependencies), each pinned to a full commit SHA (identity_core at the first commit carrying `identity_core__human`), and this plugin, and seeds this plugin's page bundle. `tests/test_gitlab_manifest.py` runs
+dependencies), each pinned to a full commit SHA (identity_core at the commit of its `v0.1.3` tag, the first release carrying `identity_core__human` and the `depends_on` floor), and this plugin, and seeds this plugin's page bundle. `tests/test_gitlab_manifest.py` runs
 `validate_plugin` at structure and strict levels; `test_gitlab_instance.py`, `test_gitlab_models.py`,
 `test_gitlab_edges.py`, `test_gitlab_person.py`, `test_gitlab_icons.py`, `test_gitlab_page.py` and `test_gitlab_posture.py` cover the requirements above;
 `tests/fixtures/example-deployment.grift.json` is the reference deployment (not declared in the manifest,
