@@ -351,8 +351,9 @@ shared email or display name. An account held by two people (a shared login) kee
 adds one permission and constrains nothing else: every gitlab edge from a user is still permitted by its own
 edge file. The edge's wildcard source already permits it; the declaration records the intent on the model and
 is what `validate_plugin`'s `edge-declarations` check resolves through the declared dependency. `identity_core` was already in `depends_on`; its note now names this edge too, and the `ci`
-record's identity_core pin moved to the first commit carrying the human, which is the `v0.1.3` tag; `depends_on`
-declares that release as the floor (`min_version = "0.1.3"`).
+record's identity_core pin moved to the first commit carrying the human when this link landed. That commit
+(`53da388`) was later tagged `v0.1.3`, and the pin has not moved since; `depends_on` declares that release as
+the floor (`min_version = "0.1.3"`).
 
 #### Acceptance Criteria
 
