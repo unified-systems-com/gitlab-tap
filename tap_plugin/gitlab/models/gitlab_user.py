@@ -12,11 +12,14 @@ class GitlabUser(BaseModel):
     """A GitLab user account: a person, a service account, or a bot user behind a group or project access
     token.
 
-    Keyed by username inside its instance. user_type separates humans from service accounts and bots. It has
+    Keyed by username inside its instance. user_type separates humans from service accounts and bots. An
+    account a person holds points at identity_core's neutral human with HELD_BY_HUMAN__identity_core, drawn
+    only for accounts a person holds (never for a service account or a token bot user) and never inferred
+    from a shared email or display name. It has
     no free-form configuration field: the source records GitLab keeps for it can carry secret material, so
     only promoted columns are stored.
 
-    Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application).
+    Spec: specs/spec-gitlab-v0.md (req-gitlab-models-application, req-gitlab-person-link).
     """
 
     ENTITY_TYPE: ClassVar[str] = "gitlab__gitlab_user"
@@ -29,6 +32,11 @@ class GitlabUser(BaseModel):
     # Identity: the fields a design can know. Revisited when the collector observes GitLab's own ids
     # (req-gitlab-collector, Backlog).
     NATURAL_KEY: ClassVar[tuple[str, ...]] = ("instance_name", "username",)
+    # Edge permission. Under the grid's permission union this adds one permission and constrains nothing
+    # else: every gitlab edge from a user is still permitted by its own edge file's sources.
+    OUTBOUND_EDGES: ClassVar[list[dict[str, Any]]] = [
+        {"nodes": [{"type": "identity_core__human"}], "edges": [{"type": "HELD_BY_HUMAN__identity_core"}]},
+    ]
     DEFAULT_DISPLAY: ClassVar[dict[str, Any]] = DISPLAY_APPLICATION
 
     FIELD_CRUD_SCHEMA: ClassVar[dict[str, Any]] = {

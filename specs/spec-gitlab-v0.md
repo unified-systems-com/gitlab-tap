@@ -9,7 +9,7 @@
 | Slug | `gitlab` |
 | Display name | TAP GitLab |
 | Description | GitLab as grid vocabulary: a small self-managed GitLab as deployed (its components, Gitaly, runners and what they run on and store to) and the objects a FedRAMP operator governs in it (groups, projects, users, runners, protected branches and environments, CI/CD variables, keys and tokens, sign-in providers, audit streams), with a /gitlab page per instance. |
-| Kind | Leaf plugin: GitLab vocabulary. Consumes `identity_core` (the OIDC issuer a sign-in provider trusts) and `aws_core` (the load-balancer edge its page's ingress search names) as vocabulary only; consumed by instance plugins that design or observe a GitLab (highbar first). |
+| Kind | Leaf plugin: GitLab vocabulary. Consumes `identity_core` (the OIDC issuer a sign-in provider trusts, and the human a user account is held by) and `aws_core` (the load-balancer edge its page's ingress search names) as vocabulary only; consumed by instance plugins that design or observe a GitLab (highbar first). |
 
 **Default dimensions**
 
@@ -122,6 +122,7 @@ password sign-in disabled. Encryption: one KMS key for the buckets and secrets.
 | req-gitlab-models-application | [Application Models](#application-models) | Implemented | Twelve governed object types |
 | req-gitlab-edges-infrastructure | [Infrastructure Edges](#infrastructure-edges) | Implemented | Processes, where they run, what they reach |
 | req-gitlab-edges-application | [Application Edges](#application-edges) | Implemented | Hierarchy, membership, grants, credentials, sign-in, audit |
+| req-gitlab-person-link | [Person Link](#person-link) | Implemented | A user account a person holds declares `HELD_BY_HUMAN__identity_core` to `identity_core__human` |
 | req-gitlab-icons | [Icons](#icons-requirement) | Implemented | Own glyphs; GitLab's logo is not licensed for this use |
 | req-gitlab-layout | [Deployment Layout](#deployment-layout) | Implemented | The reusable layout module |
 | req-gitlab-panel-posture | [Posture Strip Panel](#posture-strip-panel) | Implemented | Instance chooser and posture tiles |
@@ -129,7 +130,7 @@ password sign-in disabled. Encryption: one KMS key for the buckets and secrets.
 | req-gitlab-record | [CI Record and Tests](#ci-record-and-tests) | Implemented | The in-package `ci` record and the suite |
 | req-gitlab-collector | [Collector](#collector) | Backlog | Observe a real GitLab onto the grid |
 | req-gitlab-containment | [Containment And Retirement](#containment-and-retirement) | Backlog | `CONTAINMENT_EDGES` and falsifiers, with the collector |
-| req-gitlab-neutral-links | [Neutral Links](#neutral-links) | Backlog | Project → `git_core` repository; accounts → identity substrate |
+| req-gitlab-neutral-links | [Neutral Links](#neutral-links) | Backlog | Project → `git_core` repository (the account half is `req-gitlab-person-link`) |
 | req-gitlab-pipelines | [Execution Plane](#execution-plane) | Backlog | Pipelines, jobs, schedules |
 | req-gitlab-domain-articles | [Domain Articles](#domain-articles) | Backlog | One article per type and edge |
 | req-gitlab-nongoals | [Non-goals](#non-goals) | Implemented | What this plugin will not model |
@@ -323,6 +324,41 @@ is in `depends_on` as a vocabulary dependency for `TRUSTS_ISSUER`.
 
 ---
 
+### Person Link
+----
+RID: `req-gitlab-person-link`
+
+Status: `Implemented`
+
+A GitLab user account that a person holds resolves to that person: `identity_core__human` (a neutral
+substrate type keyed on an operator-assigned handle), through identity_core's `HELD_BY_HUMAN__identity_core`,
+whose source is wildcard so no substrate depends upward on GitLab. The same person's Okta, Duo and Teleport
+accounts point at the same node, which is what an access review joins on. `gitlab__gitlab_user` holds people,
+service accounts and token bot users in one type, so the edge is drawn only for an account a person holds;
+a service account or bot user has none, and neither does an account nobody has matched yet (the unmatched
+state an access review must show). The edge is drawn by whoever knows the match (an operator's seed, an HR
+feed, a collector matching an immutable id) and records how in `matched_on`; it is never inferred from a
+shared email or display name. An account held by two people (a shared login) keeps both edges.
+
+#### Implementation
+
+`GitlabUser.OUTBOUND_EDGES` declares `{"nodes": [{"type": "identity_core__human"}], "edges": [{"type":
+"HELD_BY_HUMAN__identity_core"}]}`. Under the permission union (`tap_grid/constraints.py::validate_edge`) this
+adds one permission and constrains nothing else: every gitlab edge from a user is still permitted by its own
+edge file. `identity_core` was already in `depends_on`; its note now names this edge too, and the `ci`
+record's identity_core pin moved to the first commit carrying the human.
+
+#### Acceptance Criteria
+
+| ACID | Title | Status | Description | Notes |
+| --- | --- | :---: | --- | --- |
+| req-gitlab-person-link-1 | Declared | Implemented | `GitlabUser` declares `HELD_BY_HUMAN__identity_core` to `identity_core__human` in `OUTBOUND_EDGES`, and `identity_core` is in `depends_on`. | `test_person_link_is_declared` |
+| req-gitlab-person-link-2 | Written Through The Service Layer | Implemented | A user writes `HELD_BY_HUMAN__identity_core` to a human with `matched_on`; an unknown property is refused. | `test_account_is_held_by_a_human` |
+| req-gitlab-person-link-3 | Shared Account Recorded | Implemented | One user may be held by two humans; both edges stand. | `test_shared_account_is_recorded` |
+| req-gitlab-person-link-4 | Nothing Else Constrained | Implemented | Declaring `OUTBOUND_EDGES` leaves the user's own gitlab edges (`MEMBER_OF_PROJECT`, `SIGNS_IN_VIA_PROVIDER`) writable. | `test_own_edges_still_permitted` |
+
+---
+
 ### Icons Requirement
 ----
 RID: `req-gitlab-icons`
@@ -478,9 +514,9 @@ The in-package `ci` boot record (`req-boot-bootstrap-ci-record`) and the tests t
 #### Implementation
 
 `boot/ci.boot.json` installs `identity_core` and `aws_core` (the depends_on closure; neither declares
-dependencies), each pinned to a full commit SHA, and this plugin, and seeds this plugin's page bundle. `tests/test_gitlab_manifest.py` runs
+dependencies), each pinned to a full commit SHA (identity_core at the first commit carrying `identity_core__human`), and this plugin, and seeds this plugin's page bundle. `tests/test_gitlab_manifest.py` runs
 `validate_plugin` at structure and strict levels; `test_gitlab_instance.py`, `test_gitlab_models.py`,
-`test_gitlab_edges.py`, `test_gitlab_icons.py`, `test_gitlab_page.py` and `test_gitlab_posture.py` cover the requirements above;
+`test_gitlab_edges.py`, `test_gitlab_person.py`, `test_gitlab_icons.py`, `test_gitlab_page.py` and `test_gitlab_posture.py` cover the requirements above;
 `tests/fixtures/example-deployment.grift.json` is the reference deployment (not declared in the manifest,
 never seeded).
 
@@ -526,8 +562,8 @@ RID: `req-gitlab-neutral-links`
 
 Status: `Backlog`
 
-`gitlab__gitlab_project` → `git_core__git_repository` (the settled `HOSTS_REPOSITORY` pattern), and
-accounts to the identity substrate, once a collector reads both sides.
+`gitlab__gitlab_project` → `git_core__git_repository` (the settled `HOSTS_REPOSITORY` pattern), once a
+collector reads both sides. Accounts to the identity substrate moved to `req-gitlab-person-link`.
 
 ---
 
