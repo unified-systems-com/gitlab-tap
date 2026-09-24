@@ -8,12 +8,12 @@
       "batch_entity": {
         "entity_id": "01a0cc8d-36e5-75be-acb5-71e573fd7e3d",
         "entity_type": "batch",
-        "name": "gitlab page v0.1.1",
+        "name": "gitlab page v0.2.0",
         "dimensions": {}
       },
       "batch_node": {
         "source": "plugins.gitlab",
-        "name": "gitlab page v0.1.1",
+        "name": "gitlab page v0.2.0",
         "description": "The /gitlab page (req-gitlab-page): the deployment graph (projection, elevation, layout module, scene searches), the posture strip, and the operator tables with their searches. Every search takes ?instance=<name>."
       },
       "nodes": [
@@ -93,7 +93,7 @@
             "definition": {
               "query": [
                 "MATCH (i:gitlab__gitlab_instance)",
-                "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR i.data.name = $instance)",
                 "RETURN i"
               ]
             },
@@ -101,9 +101,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -127,7 +130,7 @@
             "definition": {
               "query": [
                 "MATCH (i:gitlab__gitlab_instance)-[:RUNS_COMPONENT__gitlab]->(c)",
-                "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR i.data.name = $instance)",
                 "RETURN i, c"
               ]
             },
@@ -135,9 +138,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -161,7 +167,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__gitlab_component)-[:RUNS_ON_SERVICE__gitlab]->(t)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c, t"
               ]
             },
@@ -169,9 +175,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -195,7 +204,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__gitaly_node)-[:RUNS_ON_SERVICE__gitlab]->(t)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c, t"
               ]
             },
@@ -203,9 +212,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -229,7 +241,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__runner_manager)-[:RUNS_ON_SERVICE__gitlab]->(t)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c, t"
               ]
             },
@@ -237,9 +249,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -263,7 +278,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__gitlab_component)-[:QUERIES_DATABASE__gitlab]->(t)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c, t"
               ]
             },
@@ -271,9 +286,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -297,7 +315,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__gitaly_node)-[:QUERIES_DATABASE__gitlab]->(t)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c, t"
               ]
             },
@@ -305,9 +323,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -331,7 +352,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__gitlab_component)-[:CALLS_REDIS__gitlab]->(t)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c, t"
               ]
             },
@@ -339,9 +360,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -365,7 +389,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__gitlab_component)-[:STORES_OBJECTS__gitlab]->(t)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c, t"
               ]
             },
@@ -373,9 +397,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -399,7 +426,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__runner_manager)-[:STORES_OBJECTS__gitlab]->(t)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c, t"
               ]
             },
@@ -407,9 +434,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -433,7 +463,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__gitaly_node)-[:STORES_REPOSITORIES_ON_VOLUME__gitlab]->(t)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c, t"
               ]
             },
@@ -441,9 +471,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -467,7 +500,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__gitlab_component)-[:READS_SECRET__gitlab]->(t)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c, t"
               ]
             },
@@ -475,9 +508,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -501,7 +537,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__gitaly_node)-[:READS_SECRET__gitlab]->(t)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c, t"
               ]
             },
@@ -509,9 +545,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -535,7 +574,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__runner_manager)-[:READS_SECRET__gitlab]->(t)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c, t"
               ]
             },
@@ -543,9 +582,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -569,7 +611,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__runner_manager)-[:LAUNCHES_JOB_TASKS__gitlab]->(t)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c, t"
               ]
             },
@@ -577,9 +619,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -603,7 +648,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__runner_manager)-[:AUTHENTICATES_AS_RUNNER__gitlab]->(t)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c, t"
               ]
             },
@@ -611,9 +656,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -637,7 +685,7 @@
             "definition": {
               "query": [
                 "MATCH (lb)-[:ROUTES_TRAFFIC__aws_core]->(c:gitlab__gitlab_component)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN lb, c"
               ]
             },
@@ -645,9 +693,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -671,7 +722,7 @@
             "definition": {
               "query": [
                 "MATCH (i:gitlab__gitlab_instance)-[:REGISTERS_RUNNER__gitlab]->(r:gitlab__gitlab_runner)",
-                "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance AND r.data.runner_type = \"instance_type\"",
+                "WHERE ($instance IS NULL OR i.data.name = $instance) AND r.data.runner_type = \"instance_type\"",
                 "RETURN i, r"
               ]
             },
@@ -679,9 +730,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -705,7 +759,7 @@
             "definition": {
               "query": [
                 "MATCH (i:gitlab__gitlab_instance)-[:AUTHENTICATES_VIA_PROVIDER__gitlab]->(p)",
-                "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR i.data.name = $instance)",
                 "RETURN i, p"
               ]
             },
@@ -713,9 +767,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -739,7 +796,7 @@
             "definition": {
               "query": [
                 "MATCH (p:gitlab__sso_provider)-[:TRUSTS_SAML_IDP__gitlab]->(x)",
-                "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR p.data.instance_name = $instance)",
                 "RETURN p, x"
               ]
             },
@@ -747,9 +804,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -773,7 +833,7 @@
             "definition": {
               "query": [
                 "MATCH (p:gitlab__sso_provider)-[:TRUSTS_ISSUER__identity_core]->(x)",
-                "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR p.data.instance_name = $instance)",
                 "RETURN p, x"
               ]
             },
@@ -781,9 +841,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -807,7 +870,7 @@
             "definition": {
               "query": [
                 "MATCH (i:gitlab__gitlab_instance)-[:STREAMS_AUDIT_EVENTS__gitlab]->(d)",
-                "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR i.data.name = $instance)",
                 "RETURN i, d"
               ]
             },
@@ -815,9 +878,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -841,7 +907,7 @@
             "definition": {
               "query": [
                 "MATCH (d:gitlab__audit_event_destination)-[:DELIVERS_EVENTS__gitlab]->(x)",
-                "WHERE d.data.instance_name STARTS_WITH $instance AND d.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR d.data.instance_name = $instance)",
                 "RETURN d, x"
               ]
             },
@@ -849,9 +915,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -909,17 +978,17 @@
                   "help": "GitLab components whose last health verdict was degraded or unhealthy, out of those whose health was observed. Components never checked are counted apart: unknown, not healthy.",
                   "population": [
                     "MATCH (c:gitlab__gitlab_component)",
-                    "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance AND c.data.health != \"\"",
+                    "WHERE ($instance IS NULL OR c.data.instance_name = $instance) AND c.data.health != \"\"",
                     "RETURN c"
                   ],
                   "finding": [
                     "MATCH (c:gitlab__gitlab_component)",
-                    "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance AND c.data.health IN [\"degraded\", \"unhealthy\"]",
+                    "WHERE ($instance IS NULL OR c.data.instance_name = $instance) AND c.data.health IN [\"degraded\", \"unhealthy\"]",
                     "RETURN c"
                   ],
                   "unobserved": [
                     "MATCH (c:gitlab__gitlab_component)",
-                    "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance AND c.data.health = \"\"",
+                    "WHERE ($instance IS NULL OR c.data.instance_name = $instance) AND c.data.health = \"\"",
                     "RETURN c"
                   ],
                   "tone": "bad_if_any"
@@ -930,12 +999,12 @@
                   "help": "Gitaly nodes whose repositories sit on NFS or EFS, out of those whose volume's filesystem was observed. GitLab supports only local block storage (an attached EBS volume) for Gitaly.",
                   "population": [
                     "MATCH (g:gitlab__gitaly_node)-[e:STORES_REPOSITORIES_ON_VOLUME__gitlab]->(v)",
-                    "WHERE g.data.instance_name STARTS_WITH $instance AND g.data.instance_name ENDS_WITH $instance AND e.data.properties.filesystem IS NOT NULL",
+                    "WHERE ($instance IS NULL OR g.data.instance_name = $instance) AND e.data.properties.filesystem IS NOT NULL",
                     "RETURN g"
                   ],
                   "finding": [
                     "MATCH (g:gitlab__gitaly_node)-[e:STORES_REPOSITORIES_ON_VOLUME__gitlab]->(v)",
-                    "WHERE g.data.instance_name STARTS_WITH $instance AND g.data.instance_name ENDS_WITH $instance AND e.data.properties.filesystem IN [\"nfs\", \"efs\"]",
+                    "WHERE ($instance IS NULL OR g.data.instance_name = $instance) AND e.data.properties.filesystem IN [\"nfs\", \"efs\"]",
                     "RETURN g"
                   ],
                   "tone": "bad_if_any"
@@ -946,17 +1015,17 @@
                   "help": "Instance-scoped runners that take untagged jobs from unprotected refs: any project's pipeline, including a fork's merge request, can run on them. Counted out of runners whose scope, untagged and ref settings were all observed.",
                   "population": [
                     "MATCH (r:gitlab__gitlab_runner)",
-                    "WHERE r.data.instance_name STARTS_WITH $instance AND r.data.instance_name ENDS_WITH $instance AND r.data.runner_type != \"\" AND r.data.run_untagged IS NOT NULL AND r.data.access_level != \"\"",
+                    "WHERE ($instance IS NULL OR r.data.instance_name = $instance) AND r.data.runner_type != \"\" AND r.data.run_untagged IS NOT NULL AND r.data.access_level != \"\"",
                     "RETURN r"
                   ],
                   "finding": [
                     "MATCH (r:gitlab__gitlab_runner)",
-                    "WHERE r.data.instance_name STARTS_WITH $instance AND r.data.instance_name ENDS_WITH $instance AND r.data.runner_type = \"instance_type\" AND r.data.run_untagged = true AND r.data.access_level = \"not_protected\"",
+                    "WHERE ($instance IS NULL OR r.data.instance_name = $instance) AND r.data.runner_type = \"instance_type\" AND r.data.run_untagged = true AND r.data.access_level = \"not_protected\"",
                     "RETURN r"
                   ],
                   "unobserved": [
                     "MATCH (r:gitlab__gitlab_runner)",
-                    "WHERE r.data.instance_name STARTS_WITH $instance AND r.data.instance_name ENDS_WITH $instance AND (r.data.runner_type = \"\" OR r.data.run_untagged IS NULL OR r.data.access_level = \"\")",
+                    "WHERE ($instance IS NULL OR r.data.instance_name = $instance) AND (r.data.runner_type = \"\" OR r.data.run_untagged IS NULL OR r.data.access_level = \"\")",
                     "RETURN r"
                   ],
                   "tone": "bad_if_any"
@@ -967,17 +1036,17 @@
                   "help": "Runner managers configured to run jobs privileged. A privileged job can escape to its host and read other jobs' secrets. Read from config.toml; the GitLab API does not expose it.",
                   "population": [
                     "MATCH (m:gitlab__runner_manager)",
-                    "WHERE m.data.instance_name STARTS_WITH $instance AND m.data.instance_name ENDS_WITH $instance AND m.data.privileged IS NOT NULL",
+                    "WHERE ($instance IS NULL OR m.data.instance_name = $instance) AND m.data.privileged IS NOT NULL",
                     "RETURN m"
                   ],
                   "finding": [
                     "MATCH (m:gitlab__runner_manager)",
-                    "WHERE m.data.instance_name STARTS_WITH $instance AND m.data.instance_name ENDS_WITH $instance AND m.data.privileged = true",
+                    "WHERE ($instance IS NULL OR m.data.instance_name = $instance) AND m.data.privileged = true",
                     "RETURN m"
                   ],
                   "unobserved": [
                     "MATCH (m:gitlab__runner_manager)",
-                    "WHERE m.data.instance_name STARTS_WITH $instance AND m.data.instance_name ENDS_WITH $instance AND m.data.privileged IS NULL",
+                    "WHERE ($instance IS NULL OR m.data.instance_name = $instance) AND m.data.privileged IS NULL",
                     "RETURN m"
                   ],
                   "tone": "bad_if_any"
@@ -988,25 +1057,25 @@
                   "help": "Variables every pipeline receives, including those on unprotected branches, out of those whose protection was observed. The second number counts variables GitLab does not mask in job logs.",
                   "population": [
                     "MATCH (v:gitlab__ci_variable)",
-                    "WHERE v.data.instance_name STARTS_WITH $instance AND v.data.instance_name ENDS_WITH $instance AND v.data.protected IS NOT NULL",
+                    "WHERE ($instance IS NULL OR v.data.instance_name = $instance) AND v.data.protected IS NOT NULL",
                     "RETURN v"
                   ],
                   "finding": [
                     "MATCH (v:gitlab__ci_variable)",
-                    "WHERE v.data.instance_name STARTS_WITH $instance AND v.data.instance_name ENDS_WITH $instance AND v.data.protected = false",
+                    "WHERE ($instance IS NULL OR v.data.instance_name = $instance) AND v.data.protected = false",
                     "RETURN v"
                   ],
                   "secondary": {
                     "label": "not masked",
                     "query": [
                       "MATCH (v:gitlab__ci_variable)",
-                      "WHERE v.data.instance_name STARTS_WITH $instance AND v.data.instance_name ENDS_WITH $instance AND v.data.masked = false",
+                      "WHERE ($instance IS NULL OR v.data.instance_name = $instance) AND v.data.masked = false",
                       "RETURN v"
                     ]
                   },
                   "unobserved": [
                     "MATCH (v:gitlab__ci_variable)",
-                    "WHERE v.data.instance_name STARTS_WITH $instance AND v.data.instance_name ENDS_WITH $instance AND v.data.protected IS NULL",
+                    "WHERE ($instance IS NULL OR v.data.instance_name = $instance) AND v.data.protected IS NULL",
                     "RETURN v"
                   ],
                   "tone": "bad_if_any"
@@ -1017,25 +1086,25 @@
                   "help": "Live personal, group, project and impersonation tokens with no expiry date, out of tokens whose expiry was observed. The second number counts live tokens expiring in the next 30 days.",
                   "population": [
                     "MATCH (t:gitlab__access_token)",
-                    "WHERE t.data.instance_name STARTS_WITH $instance AND t.data.instance_name ENDS_WITH $instance AND t.data.expires IS NOT NULL",
+                    "WHERE ($instance IS NULL OR t.data.instance_name = $instance) AND t.data.expires IS NOT NULL",
                     "RETURN t"
                   ],
                   "finding": [
                     "MATCH (t:gitlab__access_token)",
-                    "WHERE t.data.instance_name STARTS_WITH $instance AND t.data.instance_name ENDS_WITH $instance AND t.data.expires = false AND (t.data.revoked = false OR t.data.revoked IS NULL)",
+                    "WHERE ($instance IS NULL OR t.data.instance_name = $instance) AND t.data.expires = false AND (t.data.revoked = false OR t.data.revoked IS NULL)",
                     "RETURN t"
                   ],
                   "secondary": {
                     "label": "expire within 30 days",
                     "query": [
                       "MATCH (t:gitlab__access_token)",
-                      "WHERE t.data.instance_name STARTS_WITH $instance AND t.data.instance_name ENDS_WITH $instance AND t.data.expires_at != \"\" AND t.data.expires_at < $cutoff AND (t.data.revoked = false OR t.data.revoked IS NULL)",
+                      "WHERE ($instance IS NULL OR t.data.instance_name = $instance) AND t.data.expires_at != \"\" AND t.data.expires_at < $cutoff AND (t.data.revoked = false OR t.data.revoked IS NULL)",
                       "RETURN t"
                     ]
                   },
                   "unobserved": [
                     "MATCH (t:gitlab__access_token)",
-                    "WHERE t.data.instance_name STARTS_WITH $instance AND t.data.instance_name ENDS_WITH $instance AND t.data.expires IS NULL",
+                    "WHERE ($instance IS NULL OR t.data.instance_name = $instance) AND t.data.expires IS NULL",
                     "RETURN t"
                   ],
                   "tone": "bad_if_any"
@@ -1046,25 +1115,25 @@
                   "help": "Deploy keys with no expiry, out of keys whose expiry was observed. The second number counts keys some project lets push.",
                   "population": [
                     "MATCH (k:gitlab__deploy_key)",
-                    "WHERE k.data.instance_name STARTS_WITH $instance AND k.data.instance_name ENDS_WITH $instance AND k.data.expires IS NOT NULL",
+                    "WHERE ($instance IS NULL OR k.data.instance_name = $instance) AND k.data.expires IS NOT NULL",
                     "RETURN k"
                   ],
                   "finding": [
                     "MATCH (k:gitlab__deploy_key)",
-                    "WHERE k.data.instance_name STARTS_WITH $instance AND k.data.instance_name ENDS_WITH $instance AND k.data.expires = false",
+                    "WHERE ($instance IS NULL OR k.data.instance_name = $instance) AND k.data.expires = false",
                     "RETURN k"
                   ],
                   "secondary": {
                     "label": "with write access",
                     "query": [
                       "MATCH (p:gitlab__gitlab_project)-[e:ENABLES_DEPLOY_KEY__gitlab]->(k:gitlab__deploy_key)",
-                      "WHERE k.data.instance_name STARTS_WITH $instance AND k.data.instance_name ENDS_WITH $instance AND e.data.properties.can_push = true",
+                      "WHERE ($instance IS NULL OR k.data.instance_name = $instance) AND e.data.properties.can_push = true",
                       "RETURN k"
                     ]
                   },
                   "unobserved": [
                     "MATCH (k:gitlab__deploy_key)",
-                    "WHERE k.data.instance_name STARTS_WITH $instance AND k.data.instance_name ENDS_WITH $instance AND k.data.expires IS NULL",
+                    "WHERE ($instance IS NULL OR k.data.instance_name = $instance) AND k.data.expires IS NULL",
                     "RETURN k"
                   ],
                   "tone": "bad_if_any"
@@ -1075,17 +1144,17 @@
                   "help": "Protected-branch rules that still allow force-push, which rewrites history the protection was meant to keep.",
                   "population": [
                     "MATCH (b:gitlab__protected_branch)",
-                    "WHERE b.data.instance_name STARTS_WITH $instance AND b.data.instance_name ENDS_WITH $instance AND b.data.allow_force_push IS NOT NULL",
+                    "WHERE ($instance IS NULL OR b.data.instance_name = $instance) AND b.data.allow_force_push IS NOT NULL",
                     "RETURN b"
                   ],
                   "finding": [
                     "MATCH (b:gitlab__protected_branch)",
-                    "WHERE b.data.instance_name STARTS_WITH $instance AND b.data.instance_name ENDS_WITH $instance AND b.data.allow_force_push = true",
+                    "WHERE ($instance IS NULL OR b.data.instance_name = $instance) AND b.data.allow_force_push = true",
                     "RETURN b"
                   ],
                   "unobserved": [
                     "MATCH (b:gitlab__protected_branch)",
-                    "WHERE b.data.instance_name STARTS_WITH $instance AND b.data.instance_name ENDS_WITH $instance AND b.data.allow_force_push IS NULL",
+                    "WHERE ($instance IS NULL OR b.data.instance_name = $instance) AND b.data.allow_force_push IS NULL",
                     "RETURN b"
                   ],
                   "tone": "bad_if_any"
@@ -1096,17 +1165,17 @@
                   "help": "Projects whose CI_JOB_TOKEN inbound allowlist is off: a job in any project on the instance can use its token against them.",
                   "population": [
                     "MATCH (p:gitlab__gitlab_project)",
-                    "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance AND p.data.job_token_inbound_enabled IS NOT NULL",
+                    "WHERE ($instance IS NULL OR p.data.instance_name = $instance) AND p.data.job_token_inbound_enabled IS NOT NULL",
                     "RETURN p"
                   ],
                   "finding": [
                     "MATCH (p:gitlab__gitlab_project)",
-                    "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance AND p.data.job_token_inbound_enabled = false",
+                    "WHERE ($instance IS NULL OR p.data.instance_name = $instance) AND p.data.job_token_inbound_enabled = false",
                     "RETURN p"
                   ],
                   "unobserved": [
                     "MATCH (p:gitlab__gitlab_project)",
-                    "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance AND p.data.job_token_inbound_enabled IS NULL",
+                    "WHERE ($instance IS NULL OR p.data.instance_name = $instance) AND p.data.job_token_inbound_enabled IS NULL",
                     "RETURN p"
                   ],
                   "tone": "bad_if_any"
@@ -1117,17 +1186,17 @@
                   "help": "Active human accounts with no GitLab two-factor authentication, out of human accounts whose 2FA status was observed. Where sign-in goes only through an SSO provider that enforces MFA, this is expected; the sign-in table says whether it does.",
                   "population": [
                     "MATCH (u:gitlab__gitlab_user)",
-                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.user_type = \"human\" AND u.data.two_factor_enabled IS NOT NULL",
+                    "WHERE ($instance IS NULL OR u.data.instance_name = $instance) AND u.data.user_type = \"human\" AND u.data.two_factor_enabled IS NOT NULL",
                     "RETURN u"
                   ],
                   "finding": [
                     "MATCH (u:gitlab__gitlab_user)",
-                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.user_type = \"human\" AND u.data.state = \"active\" AND u.data.two_factor_enabled = false",
+                    "WHERE ($instance IS NULL OR u.data.instance_name = $instance) AND u.data.user_type = \"human\" AND u.data.state = \"active\" AND u.data.two_factor_enabled = false",
                     "RETURN u"
                   ],
                   "unobserved": [
                     "MATCH (u:gitlab__gitlab_user)",
-                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.user_type = \"human\" AND u.data.two_factor_enabled IS NULL",
+                    "WHERE ($instance IS NULL OR u.data.instance_name = $instance) AND u.data.user_type = \"human\" AND u.data.two_factor_enabled IS NULL",
                     "RETURN u"
                   ],
                   "tone": "bad_if_any"
@@ -1138,17 +1207,17 @@
                   "help": "Accounts with instance administrator rights. Not a finding by itself; the number an assessor asks for first.",
                   "population": [
                     "MATCH (u:gitlab__gitlab_user)",
-                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.is_admin IS NOT NULL",
+                    "WHERE ($instance IS NULL OR u.data.instance_name = $instance) AND u.data.is_admin IS NOT NULL",
                     "RETURN u"
                   ],
                   "finding": [
                     "MATCH (u:gitlab__gitlab_user)",
-                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.is_admin = true",
+                    "WHERE ($instance IS NULL OR u.data.instance_name = $instance) AND u.data.is_admin = true",
                     "RETURN u"
                   ],
                   "unobserved": [
                     "MATCH (u:gitlab__gitlab_user)",
-                    "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance AND u.data.is_admin IS NULL",
+                    "WHERE ($instance IS NULL OR u.data.instance_name = $instance) AND u.data.is_admin IS NULL",
                     "RETURN u"
                   ],
                   "tone": "bad_if_any"
@@ -1159,17 +1228,17 @@
                   "help": "Instances that still accept a password on the web sign-in page. With SSO in place, password sign-in is the path around it.",
                   "population": [
                     "MATCH (i:gitlab__gitlab_instance)",
-                    "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance AND i.data.password_auth_enabled_for_web IS NOT NULL",
+                    "WHERE ($instance IS NULL OR i.data.name = $instance) AND i.data.password_auth_enabled_for_web IS NOT NULL",
                     "RETURN i"
                   ],
                   "finding": [
                     "MATCH (i:gitlab__gitlab_instance)",
-                    "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance AND i.data.password_auth_enabled_for_web = true",
+                    "WHERE ($instance IS NULL OR i.data.name = $instance) AND i.data.password_auth_enabled_for_web = true",
                     "RETURN i"
                   ],
                   "unobserved": [
                     "MATCH (i:gitlab__gitlab_instance)",
-                    "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance AND i.data.password_auth_enabled_for_web IS NULL",
+                    "WHERE ($instance IS NULL OR i.data.name = $instance) AND i.data.password_auth_enabled_for_web IS NULL",
                     "RETURN i"
                   ],
                   "tone": "bad_if_any"
@@ -1180,12 +1249,12 @@
                   "help": "Instances with at least one destination observed active. Streaming is an Ultimate feature; a Community Edition instance must ship audit_json.log another way, and reads zero here.",
                   "population": [
                     "MATCH (i:gitlab__gitlab_instance)",
-                    "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance",
+                    "WHERE ($instance IS NULL OR i.data.name = $instance)",
                     "RETURN i"
                   ],
                   "finding": [
                     "MATCH (i:gitlab__gitlab_instance)-[:STREAMS_AUDIT_EVENTS__gitlab]->(d:gitlab__audit_event_destination)",
-                    "WHERE i.data.name STARTS_WITH $instance AND i.data.name ENDS_WITH $instance AND d.data.active = true",
+                    "WHERE ($instance IS NULL OR i.data.name = $instance) AND d.data.active = true",
                     "RETURN i"
                   ],
                   "tone": "good_if_any"
@@ -1211,7 +1280,7 @@
             "definition": {
               "query": [
                 "MATCH (c:gitlab__gitlab_component)",
-                "WHERE c.data.instance_name STARTS_WITH $instance AND c.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR c.data.instance_name = $instance)",
                 "RETURN c"
               ]
             },
@@ -1219,9 +1288,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -1332,7 +1404,7 @@
             "definition": {
               "query": [
                 "MATCH (g:gitlab__gitaly_node)",
-                "WHERE g.data.instance_name STARTS_WITH $instance AND g.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR g.data.instance_name = $instance)",
                 "RETURN g"
               ]
             },
@@ -1340,9 +1412,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -1461,7 +1536,7 @@
             "definition": {
               "query": [
                 "MATCH (r:gitlab__gitlab_runner)",
-                "WHERE r.data.instance_name STARTS_WITH $instance AND r.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR r.data.instance_name = $instance)",
                 "RETURN r"
               ]
             },
@@ -1469,9 +1544,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -1617,7 +1695,7 @@
             "definition": {
               "query": [
                 "MATCH (m:gitlab__runner_manager)",
-                "WHERE m.data.instance_name STARTS_WITH $instance AND m.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR m.data.instance_name = $instance)",
                 "RETURN m"
               ]
             },
@@ -1625,9 +1703,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -1755,7 +1836,7 @@
             "definition": {
               "query": [
                 "MATCH (p:gitlab__gitlab_project)",
-                "WHERE p.data.instance_name STARTS_WITH $instance AND p.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR p.data.instance_name = $instance)",
                 "RETURN p"
               ]
             },
@@ -1763,9 +1844,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -1880,7 +1964,7 @@
             "definition": {
               "query": [
                 "MATCH (b:gitlab__protected_branch)",
-                "WHERE b.data.instance_name STARTS_WITH $instance AND b.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR b.data.instance_name = $instance)",
                 "RETURN b"
               ]
             },
@@ -1888,9 +1972,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -1996,7 +2083,7 @@
             "definition": {
               "query": [
                 "MATCH (e:gitlab__gitlab_environment)",
-                "WHERE e.data.instance_name STARTS_WITH $instance AND e.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR e.data.instance_name = $instance)",
                 "RETURN e"
               ]
             },
@@ -2004,9 +2091,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -2108,7 +2198,7 @@
             "definition": {
               "query": [
                 "MATCH (v:gitlab__ci_variable)",
-                "WHERE v.data.instance_name STARTS_WITH $instance AND v.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR v.data.instance_name = $instance)",
                 "RETURN v"
               ]
             },
@@ -2116,9 +2206,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -2230,7 +2323,7 @@
             "definition": {
               "query": [
                 "MATCH (t:gitlab__access_token)",
-                "WHERE t.data.instance_name STARTS_WITH $instance AND t.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR t.data.instance_name = $instance)",
                 "RETURN t"
               ]
             },
@@ -2238,9 +2331,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -2353,7 +2449,7 @@
             "definition": {
               "query": [
                 "MATCH (k:gitlab__deploy_key)",
-                "WHERE k.data.instance_name STARTS_WITH $instance AND k.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR k.data.instance_name = $instance)",
                 "RETURN k"
               ]
             },
@@ -2361,9 +2457,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -2453,7 +2552,7 @@
             "definition": {
               "query": [
                 "MATCH (d:gitlab__deploy_token)",
-                "WHERE d.data.instance_name STARTS_WITH $instance AND d.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR d.data.instance_name = $instance)",
                 "RETURN d"
               ]
             },
@@ -2461,9 +2560,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -2561,7 +2663,7 @@
             "definition": {
               "query": [
                 "MATCH (u:gitlab__gitlab_user)",
-                "WHERE u.data.instance_name STARTS_WITH $instance AND u.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR u.data.instance_name = $instance)",
                 "RETURN u"
               ]
             },
@@ -2569,9 +2671,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -2695,7 +2800,7 @@
             "definition": {
               "query": [
                 "MATCH (s:gitlab__sso_provider)",
-                "WHERE s.data.instance_name STARTS_WITH $instance AND s.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR s.data.instance_name = $instance)",
                 "RETURN s"
               ]
             },
@@ -2703,9 +2808,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -2805,7 +2913,7 @@
             "definition": {
               "query": [
                 "MATCH (a:gitlab__audit_event_destination)",
-                "WHERE a.data.instance_name STARTS_WITH $instance AND a.data.instance_name ENDS_WITH $instance",
+                "WHERE ($instance IS NULL OR a.data.instance_name = $instance)",
                 "RETURN a"
               ]
             },
@@ -2813,9 +2921,12 @@
               "type": "object",
               "properties": {
                 "instance": {
-                  "type": "string",
-                  "default": "",
-                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=. Blank selects every instance, which is the single instance when there is one."
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "default": null,
+                  "description": "The GitLab instance's name (its natural key), from the page's ?instance=, matched exactly. Absent, it is null and every instance matches ($instance IS NULL): the single instance when there is one."
                 }
               },
               "additionalProperties": false
@@ -2899,7 +3010,7 @@
             "name": "GitLab",
             "slug": "/gitlab",
             "nav_weight": 140,
-            "description": "One self-managed GitLab instance's front page for an operator in a FedRAMP 20x environment: the deployment as a picture, the posture tiles, then the tables an assessor asks for (components, runners, projects and their protections, variables, credentials, accounts, sign-in, audit streaming). ?instance=<name> picks the instance; blank shows every instance, which is the single instance when there is one.",
+            "description": "One self-managed GitLab instance's front page for an operator in a FedRAMP 20x environment: the deployment as a picture, the posture tiles, then the tables an assessor asks for (components, runners, projects and their protections, variables, credentials, accounts, sign-in, audit streaming). ?instance=<name> picks the instance, matched exactly; absent shows every instance, which is the single instance when there is one.",
             "layout": {
               "full_bleed": true,
               "columns": {

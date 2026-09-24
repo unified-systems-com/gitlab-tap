@@ -453,8 +453,8 @@ css `gitlab/css/posture.css`), registered in `GitlabConfig.ready()`. Reads throu
 `execute_gryphon_raw(..., layer="full")`; counts are envelope node counts. Inputs supplied to a query only
 if it names them: `instance` (the page's `?instance=`) and `cutoff` (now + 30 days, ISO 8601). Tile config:
 `{key, label, help, population, finding, unobserved?, secondary?: {label, query}, tone: bad_if_any |
-good_if_any}`. When the selected name is both the start and the end of another instance's name, the strip
-says the page cannot tell them apart (see `req-gitlab-page`).
+good_if_any}`. The strip reads the same exact-or-all `instance` filter as the page's searches, and treats a blank
+`?instance=` the same way they do: a value that names no instance (the strip notes it), never "every instance".
 
 #### Acceptance Criteria
 
@@ -462,7 +462,7 @@ says the page cannot tell them apart (see `req-gitlab-page`).
 | --- | --- | :---: | --- | --- |
 | req-gitlab-panel-posture-1 | Three States | Implemented | A type absent for the instance reads not observed; a populated tile counts; an error reads could not read. | `tests/test_gitlab_page.py` |
 | req-gitlab-panel-posture-4 | Unobserved Never Clear | Implemented | An object whose deciding fact is null is outside the population and counted as unobserved; a tile holding only such objects reads not observed. | A CI variable with `protected` null; the fixture's Gitaly with no volume edge. |
-| req-gitlab-panel-posture-5 | Overlapping Names Said | Implemented | Selecting a name that another instance's name begins and ends with puts a note on the strip. | `tests/test_gitlab_posture.py` |
+| req-gitlab-panel-posture-5 | No Overlap To Report | Implemented | The filter is exact, so selecting `aba` beside `ababa` puts no note on the strip (the overlap note is retired with the approximation it warned about). | `tests/test_gitlab_posture.py` |
 | req-gitlab-panel-posture-2 | Null Is Not Revoked | Implemented | A token whose `revoked` was never observed still counts as live. | |
 | req-gitlab-panel-posture-3 | Every Tile Answers | Implemented | Every tile the page configures runs without error against the example deployment. | |
 
@@ -478,22 +478,20 @@ Status: `Implemented`
 the top (66vh), the posture strip, then tables — Components, Gitaly, Runners, Runner managers, Projects,
 Protected branches, Environments, CI/CD variables, Access tokens, Deploy keys, Deploy tokens, Accounts,
 Sign-in providers, Audit event streaming. `?instance=<name>` selects the instance by its name (its natural
-key); blank selects every instance, which is the single instance when there is one.
+key), matched exactly; absent, every instance, which is the single instance when there is one.
 
 #### Implementation
 
-`grift/gitlab-page.grift.json` (`[grift] gitlab_page`), batch `gitlab page v0.1.1`: the page, the graph
+`grift/gitlab-page.grift.json` (`[grift] gitlab_page`), batch `gitlab page v0.2.0`: the page, the graph
 panel (`tap_viz/panels/graph_panel.html`) with its projection (`node_style: icon-badge`, `lock_nodes`,
 `min_zoom: fit`), elevation and layout, 23 scene searches each naming its edge type (one per edge type and
 labelled GitLab source type, because Gryphon filters a field only on a labelled variable), the posture panel
 with 13 tiles, and 14 standard table panels (`tap_web/panels/table_panel.html`) each over an envelope-mode
-search. Every search declares `instance` with `default: ""` (`req-grid-search-obj-5-2`) and filters with
-`instance_name STARTS_WITH $instance AND instance_name ENDS_WITH $instance` — Gryphon has no
-param-absent predicate yet (tap#360), and a string operator on `entity_id` is refused, so the page keys on
-the instance's name rather than its entity id. The filter is **not** exact when one instance's name both begins and
-ends with another's (`aba` also selects `ababa`); the posture strip says so when it happens, and the tables
-cannot. Name instances so that none begins and ends with another (`staging`, `production`) until tap#360
-lands, then switch every search to equality. The graph's scene includes aws_core's `ROUTES_TRAFFIC` into a component, which is why
+search. Every search declares `instance` as `["string", "null"]` with `default: null` (`req-grid-search-obj-5-2`)
+and filters with `($instance IS NULL OR instance_name = $instance)`: exact, or every instance when absent. The
+page keys on the instance's name, its natural key, not its entity id. (Before tap v0.2.2 Gryphon had no
+param-absent predicate, tap#360, and the page approximated exact-or-all with `instance_name STARTS_WITH
+$instance AND instance_name ENDS_WITH $instance`, which also selected `ababa` for `aba`; retired.) The graph's scene includes aws_core's `ROUTES_TRAFFIC` into a component, which is why
 `aws_core` is a declared vocabulary dependency.
 
 #### Acceptance Criteria
@@ -501,9 +499,9 @@ lands, then switch every search to equality. The graph's scene includes aws_core
 | ACID | Title | Status | Description | Notes |
 | --- | --- | :---: | --- | --- |
 | req-gitlab-page-1 | Imports | Implemented | The bundle imports with its hotlinks satisfied. | `tests/test_gitlab_page.py` |
-| req-gitlab-page-2 | Every Search Runs | Implemented | Every search runs blank, named and unknown; unknown returns nothing. | |
-| req-gitlab-page-3 | Prefix Selects Nothing | Implemented | A prefix of the instance's name selects nothing. | Not exact equality: see the overlap note above. |
-| req-gitlab-page-7 | Overlapping Names Kept Apart | Backlog | Selecting `aba` never returns `ababa`'s rows. | Blocked on tap#360; `test_overlapping_names_do_not_mix` is a strict xfail that flips when it lands. |
+| req-gitlab-page-2 | Every Search Runs | Implemented | Every search declares `instance` nullable with a null default and runs absent, named and unknown; unknown returns nothing. | |
+| req-gitlab-page-3 | Prefix Selects Nothing | Implemented | A prefix of the instance's name selects nothing. | |
+| req-gitlab-page-7 | Overlapping Names Kept Apart | Implemented | Selecting `aba` never returns `ababa`'s rows; absent returns both. | `test_overlapping_names_do_not_mix` (tap v0.2.2, tap#360). |
 | req-gitlab-page-4 | Scene Covers The Deployment | Implemented | The scene searches together return every node of the example deployment that the vocabulary reaches. | The GitLab ECS cluster is not reached: aws_core has no cluster→service edge. |
 | req-gitlab-page-5 | Tables Get Nodes | Implemented | A table search returns typed nodes (envelope mode). | |
 | req-gitlab-page-6 | Renders | Proposed | The page renders in a browser with every slot filled and no console error. | Not yet observed: the page has not been booted into a stack. |
