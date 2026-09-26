@@ -19,6 +19,11 @@ jobs:
     # does not grant it fails at startup — every job, not just that one.
     permissions:
       contents: write
+      # plugin-ci from tap#822 on uploads its dependency scan as SARIF, and GitHub checks every
+      # permission a called workflow's jobs declare before any job starts, so security-events:
+      # write is granted ahead of the pin moving there. contents: write stays while the pin
+      # predates tap#822 (submit-dependency-snapshot needs it); drop it once the pin is past #822.
+      security-events: write
     # Pinned to unified-systems-com/tap main at 422a56be3abe8dc63630394aac5ea9622eb70a99 (2026-09-22).
     uses: unified-systems-com/tap/.github/workflows/plugin-ci.yml@422a56be3abe8dc63630394aac5ea9622eb70a99
     with:
