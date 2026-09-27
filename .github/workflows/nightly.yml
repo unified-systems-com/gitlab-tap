@@ -26,7 +26,7 @@ jobs:
       contents: read
       security-events: write
     # Pinned to unified-systems-com/tap main at d0e3991f8d19272118a0a0d51c16df55c5adbb58 (2026-09-25).
-    uses: unified-systems-com/tap/.github/workflows/plugin-ci.yml@d0e3991f8d19272118a0a0d51c16df55c5adbb58
+    uses: unified-systems-com/tap/.github/workflows/plugin-ci.yml@210409a20ad44e6f747f01bf6da9ccd2cbc04015
     with:
       plugin_slug: gitlab
       harness_ref: main
