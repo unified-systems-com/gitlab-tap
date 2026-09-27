@@ -25,7 +25,7 @@ jobs:
       # predates tap#822 (submit-dependency-snapshot needs it); drop it once the pin is past #822.
       security-events: write
     # Pinned to unified-systems-com/tap main at 422a56be3abe8dc63630394aac5ea9622eb70a99 (2026-09-22).
-    uses: unified-systems-com/tap/.github/workflows/plugin-ci.yml@1ffb2417032350ec1d31f0af400c25b225ee66ca
+    uses: unified-systems-com/tap/.github/workflows/plugin-ci.yml@57505751b27900e5d58fc0c2b40df32f18a2b980
     with:
       plugin_slug: gitlab
     secrets:
