@@ -1,6 +1,6 @@
 manifest_version = "0"
 plugin_version = "0.1.0" # x-release-please-version
-requires_tap = ">=0.3.0"
+requires_tap = ">=0.3.1"
 slug = "gitlab"
 name = "TAP GitLab"
 description = "GitLab as grid vocabulary: a small self-managed GitLab as deployed (its components, Gitaly, runners and what they run on and store to) and the objects a FedRAMP operator governs in it (groups, projects, users, runners, protected branches and environments, CI/CD variables, keys and tokens, sign-in providers, audit streams), with a /gitlab page per instance."
