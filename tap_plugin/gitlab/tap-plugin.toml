@@ -72,6 +72,7 @@ RESIDES_ON_GITALY__gitlab = "edges/RESIDES_ON_GITALY.edge.json"
 ALLOWLISTS_JOB_TOKEN__gitlab = "edges/ALLOWLISTS_JOB_TOKEN.edge.json"
 
 [grift]
+dimension = "grift/dimension.grift.json"
 gitlab_page = "grift/gitlab-page.grift.json"
 
 # In-package boot record (req-boot-bootstrap-records-in-package). Digest is the canonical sha256

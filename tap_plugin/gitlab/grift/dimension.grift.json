@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "grift_version": "0"
+  },
+  "_reserved": {},
+  "batches": [
+    {
+      "batch_entity": {
+        "entity_id": "01a1d10a-edb0-7101-b501-73ae1972e94a",
+        "entity_type": "batch",
+        "name": "GitLab dimensions v0.1.0",
+        "dimensions": {}
+      },
+      "batch_node": {
+        "source": "plugins.gitlab",
+        "name": "GitLab dimensions v0.1.0",
+        "description": "Dimension nodes for every dimension key the gitlab plugin declares, so each key has a declared node before the dimension map moves to keying by node id (tap#708, tap#711)."
+      },
+      "nodes": [
+        {
+          "entity": {
+            "entity_id": "01a1d10a-edb0-7101-b501-73ade9cde0ae",
+            "entity_type": "dimension",
+            "name": "gitlab.plane",
+            "dimensions": {
+              "tap.meta": "dimension"
+            }
+          },
+          "node": {
+            "name": "gitlab.plane",
+            "description": "Which plane of a GitLab deployment a node or edge belongs to: infrastructure (the processes a deployment runs and what they run on and store to) or application (the objects GitLab keeps in its own database). See the dimension table in specs/spec-gitlab-v0.md."
+          }
+        }
+      ],
+      "edges": []
+    }
+  ]
+}
