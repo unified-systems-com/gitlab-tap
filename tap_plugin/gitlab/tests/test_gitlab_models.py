@@ -13,6 +13,7 @@ from tap_grid.caller_context import CallerContext
 from tap_grid.models import Entity
 from tap_grid.registry import get_model_class
 from tap_grid.services import WriteOperation, write_batch
+from tap_plugin.gitlab.tests.conftest import dimension_view
 
 #: type -> (plane, minimal payload, the name the grid should show)
 CASES: dict[str, tuple[str, dict, str]] = {
@@ -46,7 +47,7 @@ def test_minimal_write_succeeds_with_plane(type_slug: str) -> None:
     result = _create(type_slug, payload)
     assert result.success, result
     entity = Entity.objects.get(id=result.entity_id)
-    assert entity.dimensions.get("gitlab.plane") == plane
+    assert dimension_view(entity).get("gitlab.plane") == plane
     assert entity.name == shown
 
 
