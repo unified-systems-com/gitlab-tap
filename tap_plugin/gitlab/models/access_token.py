@@ -5,6 +5,7 @@ from typing import Any, ClassVar
 from django.db import models
 from tap_plugin.gitlab.models._schema import DISPLAY_APPLICATION, PLANE_APPLICATION, validation_schema
 
+from tap_grid.event_time import Interval
 from tap_grid.models import BaseModel
 
 
@@ -29,6 +30,10 @@ class AccessToken(BaseModel):
     # Identity: the fields a design can know. Revisited when the collector observes GitLab's own ids
     # (req-gitlab-collector, Backlog).
     NATURAL_KEY: ClassVar[tuple[str, ...]] = ("instance_name", "owner_path", "name",)
+    # A long-lived credential: it holds from `created_at` until `expires_at`, the end GitLab states. GitLab's
+    # token APIs send created_at as a UTC date-time ("2021-01-20T22:11:48.151Z") and expires_at as a date
+    # ("2021-01-31", day precision); both are FHIR forms, read as stored. `last_used_at` is last-seen.
+    EVENT_TIME: ClassVar[Any] = Interval("created_at", "created", end="expires_at")
     DEFAULT_DISPLAY: ClassVar[dict[str, Any]] = DISPLAY_APPLICATION
 
     FIELD_CRUD_SCHEMA: ClassVar[dict[str, Any]] = {

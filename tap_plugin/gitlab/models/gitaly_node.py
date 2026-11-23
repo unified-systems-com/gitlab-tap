@@ -5,6 +5,7 @@ from typing import Any, ClassVar
 from django.db import models
 from tap_plugin.gitlab.models._schema import DISPLAY_INFRASTRUCTURE, PLANE_INFRASTRUCTURE, validation_schema
 
+from tap_grid.event_time import NO_EVENT_TIME
 from tap_grid.models import BaseModel
 
 
@@ -30,6 +31,9 @@ class GitalyNode(BaseModel):
     # Identity: the fields a design can know. Revisited when the collector observes GitLab's own ids
     # (req-gitlab-collector, Backlog).
     NATURAL_KEY: ClassVar[tuple[str, ...]] = ("instance_name", "name",)
+    # No event time: `health_observed_at` is when the health check was read (a collection time, never
+    # declared); the source gives no time the node came to exist.
+    EVENT_TIME: ClassVar[Any] = NO_EVENT_TIME
     DEFAULT_DISPLAY: ClassVar[dict[str, Any]] = DISPLAY_INFRASTRUCTURE
 
     FIELD_CRUD_SCHEMA: ClassVar[dict[str, Any]] = {

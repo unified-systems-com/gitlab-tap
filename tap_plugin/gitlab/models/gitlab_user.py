@@ -5,6 +5,7 @@ from typing import Any, ClassVar
 from django.db import models
 from tap_plugin.gitlab.models._schema import DISPLAY_APPLICATION, PLANE_APPLICATION, validation_schema
 
+from tap_grid.event_time import NO_EVENT_TIME
 from tap_grid.models import BaseModel
 
 
@@ -34,6 +35,9 @@ class GitlabUser(BaseModel):
     # Identity: the fields a design can know. Revisited when the collector observes GitLab's own ids
     # (req-gitlab-collector, Backlog).
     NATURAL_KEY: ClassVar[tuple[str, ...]] = ("instance_name", "username",)
+    # No event time: `last_sign_in_at` and `last_activity_on` are last-seen times that stay typed fields; the
+    # account's creation time is not stored.
+    EVENT_TIME: ClassVar[Any] = NO_EVENT_TIME
     # Edge permission. Under the grid's permission union this adds one permission and constrains nothing
     # else: every gitlab edge from a user is still permitted by its own edge file's sources.
     OUTBOUND_EDGES: ClassVar[list[dict[str, Any]]] = [
