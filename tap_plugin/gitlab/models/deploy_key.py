@@ -5,6 +5,7 @@ from typing import Any, ClassVar
 from django.db import models
 from tap_plugin.gitlab.models._schema import DISPLAY_APPLICATION, PLANE_APPLICATION, validation_schema
 
+from tap_grid.event_time import Interval
 from tap_grid.models import BaseModel
 
 
@@ -29,6 +30,9 @@ class DeployKey(BaseModel):
     # Identity: the fields a design can know. Revisited when the collector observes GitLab's own ids
     # (req-gitlab-collector, Backlog).
     NATURAL_KEY: ClassVar[tuple[str, ...]] = ("instance_name", "name",)
+    # A long-lived credential: it holds from `created_at` until `expires_at`, the end GitLab states. GitLab's
+    # deploy keys API sends both as ISO 8601 date-times in UTC ("2024-10-03T01:32:21.992Z"), read as stored.
+    EVENT_TIME: ClassVar[Any] = Interval("created_at", "created", end="expires_at")
     DEFAULT_DISPLAY: ClassVar[dict[str, Any]] = DISPLAY_APPLICATION
 
     FIELD_CRUD_SCHEMA: ClassVar[dict[str, Any]] = {

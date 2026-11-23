@@ -5,6 +5,7 @@ from typing import Any, ClassVar
 from django.db import models
 from tap_plugin.gitlab.models._schema import validation_schema
 
+from tap_grid.event_time import NO_EVENT_TIME
 from tap_grid.models import BaseModel
 
 
@@ -33,6 +34,9 @@ class GitlabInstance(BaseModel):
     # A design-phase node has no observed identifier; its name is the only fact it carries.
     # Revisit when the collector makes base_url observable (req-gitlab-collector).
     NATURAL_KEY: ClassVar[tuple[str, ...]] = ("name",)
+    # No event time: the type stores no time the source gives for the instance (no creation or install time;
+    # only settings, version and URL).
+    EVENT_TIME: ClassVar[Any] = NO_EVENT_TIME
     DEFAULT_DISPLAY: ClassVar[dict[str, Any]] = {
         "tap_viz": {
             "shape": "round-rectangle",

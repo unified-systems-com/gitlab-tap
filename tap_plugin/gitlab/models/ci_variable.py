@@ -5,6 +5,7 @@ from typing import Any, ClassVar
 from django.db import models
 from tap_plugin.gitlab.models._schema import DISPLAY_APPLICATION, PLANE_APPLICATION, validation_schema
 
+from tap_grid.event_time import NO_EVENT_TIME
 from tap_grid.models import BaseModel
 
 
@@ -29,6 +30,8 @@ class CiVariable(BaseModel):
     # Identity: the fields a design can know. Revisited when the collector observes GitLab's own ids
     # (req-gitlab-collector, Backlog).
     NATURAL_KEY: ClassVar[tuple[str, ...]] = ("instance_name", "scope", "scope_path", "key", "environment_scope",)
+    # No event time: GitLab's variables API returns no time for a variable, and the type stores none.
+    EVENT_TIME: ClassVar[Any] = NO_EVENT_TIME
     DEFAULT_DISPLAY: ClassVar[dict[str, Any]] = DISPLAY_APPLICATION
 
     FIELD_CRUD_SCHEMA: ClassVar[dict[str, Any]] = {
