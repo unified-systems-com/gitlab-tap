@@ -1,6 +1,40 @@
 {
   "metadata": {
-    "grift_version": "0"
+    "grift_version": "1",
+    "spine_version": 1,
+    "type_versions": {
+      "AUTHENTICATES_AS_RUNNER__gitlab": 1,
+      "AUTHENTICATES_VIA_PROVIDER__gitlab": 1,
+      "CALLS_GITALY__gitlab": 1,
+      "CALLS_REDIS__gitlab": 1,
+      "ENCRYPTED_WITH_KEY__aws_core": 1,
+      "LAUNCHES_JOB_TASKS__gitlab": 1,
+      "QUERIES_DATABASE__gitlab": 1,
+      "READS_SECRET__gitlab": 1,
+      "REGISTERS_RUNNER__gitlab": 1,
+      "ROUTES_TRAFFIC__aws_core": 1,
+      "RUNS_COMPONENT__gitlab": 1,
+      "RUNS_ON_SERVICE__gitlab": 1,
+      "STORES_OBJECTS__gitlab": 1,
+      "TRUSTS_ISSUER__identity_core": 1,
+      "aws_core__aws_alb": 1,
+      "aws_core__aws_ecs_cluster": 1,
+      "aws_core__aws_ecs_service": 1,
+      "aws_core__aws_elasticache_cluster": 1,
+      "aws_core__aws_elb": 1,
+      "aws_core__aws_kms_key": 1,
+      "aws_core__aws_rds_instance": 1,
+      "aws_core__aws_s3_bucket": 1,
+      "aws_core__aws_secrets_manager_secret": 1,
+      "batch": 1,
+      "gitlab__gitaly_node": 1,
+      "gitlab__gitlab_component": 1,
+      "gitlab__gitlab_instance": 1,
+      "gitlab__gitlab_runner": 1,
+      "gitlab__runner_manager": 1,
+      "gitlab__sso_provider": 1,
+      "identity_core__oidc_issuer": 1
+    }
   },
   "_reserved": {},
   "batches": [
