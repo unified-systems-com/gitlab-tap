@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.3](https://github.com/unified-systems-com/gitlab-tap/compare/v0.1.2...v0.1.3) (2026-11-25)
+
+
+### Bug Fixes
+
+* ship the history event-time migration on the tap v0.5.0 floor ([ac66ae0](https://github.com/unified-systems-com/gitlab-tap/commit/ac66ae0bdd8e082e40ba99315fe7f94b33847044))
+* ship the history event-time migration on the tap v0.5.0 floor ([3d99d66](https://github.com/unified-systems-com/gitlab-tap/commit/3d99d66de9925918b8c85bb9acf30d0d4bca30c7))
+
 ## [0.1.2](https://github.com/unified-systems-com/gitlab-tap/compare/v0.1.1...v0.1.2) (2026-11-24)
 
 
