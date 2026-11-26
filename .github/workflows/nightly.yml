@@ -32,3 +32,7 @@ jobs:
     with:
       plugin_slug: gitlab
       assignee: notgeorge   # no CODEOWNERS in this repo — the org's maintainer login
+      # The migrations-from-zero parity check's stock Django migrate took 4,706s here before
+      # 0.5.0's history migration (tap#1288) and now runs past the 90-minute default. Set to
+      # GitHub's job maximum for one measured run; the final value follows from that run.
+      migrations_timeout_minutes: 360
